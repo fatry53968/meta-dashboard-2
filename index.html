@@ -51,6 +51,7 @@
   .report-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid var(--border); }
   .report-section:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
   .report-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+  .report-text { font-size: 14px; color: var(--text); line-height: 1.9; }
   .report-loading { padding: 24px; text-align: center; color: var(--text3); font-size: 13px; }
   .kpi-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
   .kpi-chip { background: var(--surface2); border-radius: 8px; padding: 8px 14px; min-width: 90px; }
@@ -59,6 +60,8 @@
 
   .ai-report-wrap { position: relative; }
   .ai-report-text { font-size: 14px; color: var(--text); line-height: 2; min-height: 60px; white-space: pre-wrap; word-break: break-word; }
+  .ai-report-text .cursor { display: inline-block; width: 2px; height: 1em; background: #1877f2; margin-left: 2px; vertical-align: text-bottom; animation: blink 0.8s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   .ai-generating-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); margin-bottom: 10px; padding: 6px 10px; background: var(--blue-bg); border-radius: 6px; }
   .ai-spinner { width: 14px; height: 14px; border: 2px solid #bbdefb; border-top-color: #1877f2; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -133,7 +136,15 @@
   .spend-bar-wrap { width:60px;height:6px;background:var(--surface2);border-radius:3px;display:inline-block;vertical-align:middle; }
   .spend-bar { height:6px;border-radius:3px;background:#1877f2; }
 
-  /* KOL 受眾測試區塊 */
+  /* ── 素材強度 badge ── */
+  .tier-badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:22px; border-radius:6px; font-size:11px; font-weight:800; letter-spacing:0.02em; white-space:nowrap; }
+  .tier-T0 { background:#1a237e; color:#fff; }
+  .tier-T1 { background:#1565c0; color:#fff; }
+  .tier-T2 { background:#e65100; color:#fff; }
+  .tier-T3 { background:var(--surface2); color:var(--text2); border: 0.5px solid var(--border2); }
+  .tier-loading { background:var(--surface2); color:var(--text3); font-size:10px; }
+
+  /* ── KOL 受眾測試區塊 ── */
   .kol-audience-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
   .kol-audience-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
   .kol-audience-header h3 { color: #fff; font-size: 14px; font-weight: 700; }
@@ -147,8 +158,12 @@
   .kol-audience-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .kol-audience-chip { background: #f3e5f5; border: 0.5px solid #ce93d8; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #4a148c; display: flex; align-items: center; gap: 5px; }
   .kol-audience-chip .chip-spend { font-size: 11px; color: #7b1fa2; font-weight: 600; }
+  .kol-total-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+  .kol-total-item { background: var(--surface2); border-radius: 8px; padding: 6px 14px; font-size: 12px; }
+  .kol-total-item span { color: var(--text3); margin-right: 4px; }
+  .kol-total-item strong { color: var(--text); }
 
-  /* KOL 素材小計 */
+  /* ── KOL 素材小計區塊 ── */
   .kol-summary-box { background: var(--surface); border: 0.5px solid #ce93d8; border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
   .kol-summary-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 10px 16px; }
   .kol-summary-header h3 { color: #fff; font-size: 13px; font-weight: 700; }
@@ -220,132 +235,8 @@ const CLIENTS = [
   }
 ];
 
-// ── 廣告類型分類邏輯 ──
-// 丰丹：行銷活動命名「轉換｜興趣」「轉換｜KOL」「轉換｜RT」「轉換｜ASC」「轉換｜類似」「互動｜RT」
-// 花現喜福：「TW - 轉換 - 興趣」「TW - 轉換 - KOL」「TW - 轉換 - RT」「TW - 轉換 - ASC」「TW - 轉換 - 類似」
-function classType(camp, ci) {
-  const t = (camp || '').toUpperCase();
-
-  // 跳過純素材測試活動（如有）
-  if (t.includes('素材')) return '__SKIP__';
-
-  // 共用判斷：流量 / 互動 / 觀看（非轉換目標）
-  // 丰丹「互動｜RT」 → 歸為「互動/流量」
-  if (
-    (t.includes('互動') && !t.includes('轉換')) ||
-    t.includes('流量') ||
-    t.includes('觀看')
-  ) return '流量/互動/觀看';
-
-  if (t.includes('ASC')) return 'ASC';
-  if (t.includes('KOL')) return 'KOL';
-
-  // 丰丹格式：「轉換｜興趣」「轉換｜類似」「轉換｜RT」
-  // 花現喜福格式：「TW - 轉換 - 興趣」「TW - 轉換 - 類似」「TW - 轉換 - RT」
-  if (t.includes('類似')) return '類似';
-  if (t.includes('RT'))   return 'RT';
-  if (t.includes('興趣')) return '興趣';
-
-  return '其他';
-}
-
-function isKolType(type, adName) {
-  if (type === 'KOL') return true;
-  if (adName && adName.toUpperCase().includes('KOL')) return true;
-  return false;
-}
-
-// ── KOL 受眾測試解析 ──
-// 丰丹 adset 格式：「興趣｜演唱會｜KOL 貢丸｜0605」→ 以「｜」分隔
-// 花現喜福 adset 格式：「興趣 - 演唱會 - KOL 達也 - 0605」→ 以「 - 」分隔
-function parseKolAdset(adsetName, ci) {
-  const name = (adsetName || '').trim();
-  if (name.toUpperCase().includes('RT')) return null;
-
-  let parts = [];
-  if (ci === 0) {
-    // 丰丹：以「｜」分隔
-    parts = name.split(/\s*[｜|]\s*/);
-  } else {
-    // 花現喜福：以「 - 」分隔
-    parts = name.split(/\s*-\s*/);
-  }
-
-  if (parts.length < 3) return null;
-  if (!parts[0].includes('興趣')) return null;
-
-  // 找含 KOL 的段落
-  let kolPartIdx = -1;
-  for (let i = 1; i < parts.length; i++) {
-    if (parts[i].toUpperCase().includes('KOL')) { kolPartIdx = i; break; }
-  }
-  if (kolPartIdx === -1) return null;
-
-  const audience = parts.slice(1, kolPartIdx).join(ci === 0 ? '｜' : ' - ').trim();
-  if (!audience) return null;
-
-  const kolRaw = parts[kolPartIdx].trim();
-  const kolName = kolRaw.replace(/^.*?KOL\s*/i, '').trim();
-  if (!kolName) return null;
-
-  return { audience, kolName };
-}
-
-function buildKolAudienceStats(rawAds, ci) {
-  const adsetSpend = {};
-  for (const ad of rawAds) {
-    const spend = parseFloat(ad.spend || 0);
-    if (spend <= 0) continue;
-    const key = (ad.adset_name || '').trim();
-    if (!key) continue;
-    adsetSpend[key] = (adsetSpend[key] || 0) + spend;
-  }
-
-  const kolMap = {};
-  for (const [adsetName, spend] of Object.entries(adsetSpend)) {
-    if (spend < 100) continue;
-    const parsed = parseKolAdset(adsetName, ci);
-    if (!parsed) continue;
-    const { audience, kolName } = parsed;
-    if (!kolMap[kolName]) kolMap[kolName] = { audiences: {}, totalSpend: 0, adsetSet: new Set() };
-    if (!kolMap[kolName].audiences[audience]) kolMap[kolName].audiences[audience] = 0;
-    kolMap[kolName].audiences[audience] += spend;
-    kolMap[kolName].totalSpend += spend;
-    kolMap[kolName].adsetSet.add(adsetName);
-  }
-  return kolMap;
-}
-
-function buildKolAudienceBlock(ci, rawAds) {
-  const kolMap = buildKolAudienceStats(rawAds, ci);
-  const kolNames = Object.keys(kolMap).sort();
-
-  if (kolNames.length === 0) {
-    return `<div class="kol-audience-body"><div style="color:var(--text3);font-size:13px;padding:8px 0">近30天內無符合條件的KOL興趣測試組合（需花費 > NT$100）</div></div>`;
-  }
-
-  let body = '';
-  for (const kolName of kolNames) {
-    const data = kolMap[kolName];
-    const audienceList = Object.entries(data.audiences).sort((a, b) => b[1] - a[1]);
-    const chips = audienceList.map(([aud, spend]) =>
-      `<div class="kol-audience-chip">${aud}<span class="chip-spend">NT$${Math.round(spend).toLocaleString()}</span></div>`
-    ).join('');
-    body += `<div class="kol-person-block">
-      <div class="kol-person-name">
-        <span style="width:8px;height:8px;border-radius:50%;background:#6a1b9a;display:inline-block;flex-shrink:0"></span>
-        <strong>${kolName}</strong>
-        <span class="kol-person-meta">不重複受眾 <b style="color:#4a148c">${audienceList.length}</b> 組｜廣告組合 <b style="color:#4a148c">${data.adsetSet.size}</b> 組｜花費 <b style="color:#4a148c">NT$${Math.round(data.totalSpend).toLocaleString()}</b></span>
-      </div>
-      <div class="kol-audience-chips">${chips}</div>
-    </div>`;
-  }
-  return `<div class="kol-audience-body">${body}</div>`;
-}
-
-// ── 工具函式 ──
-function saveGoal(ci, field, val) { try { localStorage.setItem('goal_fd_'+ci+'_'+field, val); } catch(e) {} }
-function loadGoal(ci, field) { try { return parseFloat(localStorage.getItem('goal_fd_'+ci+'_'+field) || 0); } catch(e) { return 0; } }
+function saveGoal(ci,field,val){try{localStorage.setItem('goal_fd_'+ci+'_'+field,val);}catch(e){}}
+function loadGoal(ci,field){try{return parseFloat(localStorage.getItem('goal_fd_'+ci+'_'+field)||0);}catch(e){return 0;}}
 
 const FIELDS = 'spend,impressions,clicks,ctr,reach,frequency,actions,action_values,cost_per_action_type,video_p25_watched_actions,video_p50_watched_actions,video_p100_watched_actions,video_play_actions,outbound_clicks';
 const AD_FIELDS = 'ad_name,adset_name,campaign_name,spend,impressions,clicks,ctr,actions,action_values,cost_per_action_type,outbound_clicks,video_play_actions,video_p25_watched_actions,video_p95_watched_actions';
@@ -355,25 +246,25 @@ function getDateRange() {
   const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const yest = new Date(now); yest.setDate(yest.getDate()-1);
   const dayB = new Date(now); dayB.setDate(dayB.getDate()-2);
-  return { today: fmt(yest), yesterday: fmt(dayB) };
+  return { today:fmt(yest), yesterday:fmt(dayB) };
 }
 function getExtendedDateRange(days) {
   const now = new Date();
   const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const end = new Date(now); end.setDate(end.getDate()-1);
   const start = new Date(now); start.setDate(start.getDate()-days);
-  return { since: fmt(start), until: fmt(end) };
+  return { since:fmt(start), until:fmt(end) };
 }
 
-const gv   = (d,k) => { if(!d?.actions) return 0; const a=d.actions.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
-const gcpa = (d,k) => { if(!d?.cost_per_action_type) return 0; const a=d.cost_per_action_type.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
-const gacv = (d,k) => { if(!d?.action_values) return 0; const a=d.action_values.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
-const gvid = (d,f) => { if(!d?.[f]) return 0; return d[f].reduce((s,x)=>s+parseFloat(x.value||0),0); };
-const gob  = (d)   => { if(!d?.outbound_clicks) return 0; return d.outbound_clicks.reduce((s,x)=>s+parseFloat(x.value||0),0); };
-const adv  = (ad,k) => gv(ad,k);
-const adcpa = (ad,k) => gcpa(ad,k);
-const adacv = (ad,k) => gacv(ad,k);
-const adob  = (ad) => gob(ad);
+const gv  = (d,k) => { if(!d?.actions) return 0; const a=d.actions.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
+const gcpa= (d,k) => { if(!d?.cost_per_action_type) return 0; const a=d.cost_per_action_type.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
+const gacv= (d,k) => { if(!d?.action_values) return 0; const a=d.action_values.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
+const gvid= (d,f) => { if(!d?.[f]) return 0; return d[f].reduce((s,x)=>s+parseFloat(x.value||0),0); };
+const gob = (d)   => { if(!d?.outbound_clicks) return 0; return d.outbound_clicks.reduce((s,x)=>s+parseFloat(x.value||0),0); };
+const adv = (ad,k)=> gv(ad,k);
+const adcpa=(ad,k)=> gcpa(ad,k);
+const adacv=(ad,k)=> gacv(ad,k);
+const adob = (ad) => gob(ad);
 
 function mergeInsights(arr) {
   if (!arr||arr.length===0) return null;
@@ -401,37 +292,318 @@ function mergeInsights(arr) {
 
 function normName(name) { if(!name) return '未命名'; return name.replace(/(\s*-\s*複本)+\s*$/g,'').trim(); }
 
-function sumType(rawAds, type, ci) {
-  let s=0,p=0,a=0,c=0;
-  for(const ad of rawAds){
-    if(parseFloat(ad.spend||0)<=0) continue;
-    if(classType(ad.campaign_name,ci)!==type) continue;
-    s+=parseFloat(ad.spend||0); p+=adv(ad,'purchase'); a+=adacv(ad,'purchase'); c+=adv(ad,'add_to_cart');
+// ── 廣告類型分類邏輯 ──
+// 丰丹：行銷活動命名「轉換｜興趣」「轉換｜KOL」「轉換｜RT」「轉換｜ASC」「轉換｜類似」「互動｜RT」
+// 花現喜福：「TW - 轉換 - 興趣」「TW - 轉換 - KOL」「TW - 轉換 - RT」「TW - 轉換 - ASC」「TW - 轉換 - 類似」
+function classType(camp, ci) {
+  const t = (camp || '').toUpperCase();
+  if (t.includes('素材')) return '__SKIP__';
+  if (
+    (t.includes('互動') && !t.includes('轉換')) ||
+    t.includes('流量') ||
+    t.includes('觀看')
+  ) return '流量/互動/觀看';
+  if (t.includes('ASC')) return 'ASC';
+  if (t.includes('KOL')) return 'KOL';
+  if (t.includes('類似')) return '類似';
+  if (t.includes('RT'))   return 'RT';
+  if (t.includes('興趣')) return '興趣';
+  return '其他';
+}
+
+function isKolType(type, adName) {
+  if (type === 'KOL') return true;
+  if (adName && adName.toUpperCase().includes('KOL')) return true;
+  return false;
+}
+
+/* ══════════════════════════════════════════════
+   素材強度（Tier）計算
+   判斷條件（兩者同時滿足）：
+   T0: 開啟 adset ≥ 50 且 帳戶月花費 ≥ 100,000
+   T1: 開啟 adset ≥ 20 且 帳戶月花費 ≥ 50,000
+   T2: 開啟 adset ≥ 10 且 帳戶月花費 <  50,000
+   T3: 開啟 adset <  10 且 帳戶月花費 <  50,000
+
+   activeAdsetMap: Map<normAdName, count> — 該素材對應的開啟 adset 數
+   monthSpend: 帳戶本月總花費（數字）
+══════════════════════════════════════════════ */
+function calcCreativeTier(adName, activeAdsetMap, monthSpend) {
+  const count = activeAdsetMap.get(normName(adName)) || 0;
+  const ms = monthSpend || 0;
+
+  if (count >= 50 && ms >= 100000) return 'T0';
+  if (count >= 20 && ms >= 50000)  return 'T1';
+  if (count >= 10 && ms < 50000)   return 'T2';
+  return 'T3';
+}
+
+function tierBadgeHtml(tier) {
+  return `<span class="tier-badge tier-${tier}">${tier}</span>`;
+}
+
+/* ══════════════════════════════════════════════
+   拉 Active Adset 列表（方案 A：API 真實狀態）
+   只計 興趣、類似、KOL，排除 RT、ASC
+   只計 effective_status = ACTIVE（學習）或 LEARNING_LIMITED（學習效果有限）
+   排除 SCHEDULED（已排定時間）及其他非投遞中狀態
+   回傳 Map<normAdName, count>
+══════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════
+   拉 Active Adset 列表
+   effective_status=ACTIVE 涵蓋「學習中」「學習效果有限」「正常投遞」
+   排除 RT、ASC、素材、流量/互動/觀看
+   回傳 Map<normAdName, count>
+══════════════════════════════════════════════ */
+async function fetchActiveAdsetMap(accountId) {
+  // 只拉 adset 清單（一次 API），不再用 batch 拉 ads
+  // 回傳 Set<adsetName>（開啟中、符合類型的 adset 名稱集合）
+  // 之後在 buildActiveAdsetMapFromInsights 用 adsToday 的 adset_name 交叉比對
+  const adsetFields = 'id,name,effective_status,campaign{name}';
+  let adsets = [];
+  let url = `https://graph.facebook.com/v19.0/act_${accountId}/adsets?fields=${adsetFields}&effective_status=["ACTIVE"]&limit=200&access_token=${TOKEN}`;
+  let pg = 0;
+  while (url && pg < 10) {
+    url = url.replace(/graph\.facebook\.com\/v\d+\.\d+\//, 'graph.facebook.com/v19.0/');
+    const res = await fetch(url); const data = await res.json();
+    if (data.error) { console.warn(`[Tier] err act_${accountId}:`, data.error.message); return new Set(); }
+    if (data.data) adsets = adsets.concat(data.data);
+    url = data.paging?.next || null; pg++;
   }
-  return{spend:s,purchase:p,acv:a,cart:c,cpa:p>0?s/p:0,roas:s>0?a/s:0};
+
+  // 過濾 campaign 類型，回傳有效 adset 的名稱 Set
+  const validAdsetNames = new Set();
+  for (const adset of adsets) {
+    const campName = (adset.campaign?.name || '').toUpperCase();
+    if (campName.includes('素材')) continue;
+    if (campName.includes('ASC')) continue;
+    if (campName.includes('RT')) continue;
+    if (campName.includes('互動') || campName.includes('流量') || campName.includes('觀看')) continue;
+    validAdsetNames.add(adset.name.trim());
+  }
+  console.log(`[Tier] act_${accountId} active adsets=${adsets.length} valid=${validAdsetNames.size}`);
+  return validAdsetNames;
+}
+
+// 用 adsToday insights + activeAdsetNames 交叉計算素材強度
+// activeAdsetNames: Set<adsetName>（開啟中的 adset 名稱）
+function buildActiveAdsetMapFromInsights(adsToday, ci, activeAdsetNames) {
+  const adNameToAdsetSet = new Map();
+  for (const ad of adsToday) {
+    if (parseFloat(ad.spend || 0) <= 0) continue;
+    const type = classType(ad.campaign_name, ci);
+    if (type === '__SKIP__') continue;
+    const campName = (ad.campaign_name || '').toUpperCase();
+    if (campName.includes('RT')) continue;
+    if (campName.includes('ASC')) continue;
+    const adsetKey = (ad.adset_name || '').trim();
+    if (!adsetKey) continue;
+    // 只計入目前開啟中的 adset
+    if (activeAdsetNames && activeAdsetNames.size > 0 && !activeAdsetNames.has(adsetKey)) continue;
+    const key = normName(ad.ad_name);
+    if (!adNameToAdsetSet.has(key)) adNameToAdsetSet.set(key, new Set());
+    adNameToAdsetSet.get(key).add(adsetKey);
+  }
+  const result = new Map();
+  for (const [name, set] of adNameToAdsetSet) result.set(name, set.size);
+  return result;
+}
+
+/* ══════════════════════════════════════════════
+   KOL 受眾測試分析
+══════════════════════════════════════════════ */
+// ── KOL 受眾測試解析（支援丰丹｜格式及花現喜福 - 格式）──
+function parseKolAdset(adsetName, ci) {
+  const name = (adsetName || '').trim();
+  if (name.toUpperCase().includes('RT')) return null;
+
+  let parts = [];
+  if (ci === 0) {
+    // 丰丹：以「｜」分隔
+    parts = name.split(/\s*[｜|]\s*/);
+  } else {
+    // 花現喜福：以「 - 」分隔
+    parts = name.split(/\s*-\s*/);
+  }
+
+  if (parts.length < 3) return null;
+  if (!parts[0].includes('興趣')) return null;
+
+  let kolPartIdx = -1;
+  for (let i = 1; i < parts.length; i++) {
+    if (parts[i].toUpperCase().includes('KOL')) { kolPartIdx = i; break; }
+  }
+  if (kolPartIdx === -1) return null;
+
+  const audience = parts.slice(1, kolPartIdx).join(ci === 0 ? '｜' : ' - ').trim();
+  if (!audience) return null;
+
+  const kolRaw = parts[kolPartIdx].trim();
+  const kolName = kolRaw.replace(/^.*?KOL\s*/i, '').trim();
+  if (!kolName) return null;
+
+  return { audience, kolName };
+}
+
+function buildKolAudienceStats(rawAds) {
+  const adsetSpend = {};
+  for (const ad of rawAds) {
+    const spend = parseFloat(ad.spend || 0);
+    if (spend <= 0) continue;
+    const key = (ad.adset_name || '').trim();
+    if (!key) continue;
+    adsetSpend[key] = (adsetSpend[key] || 0) + spend;
+  }
+  const kolMap = {};
+  for (const [adsetName, spend] of Object.entries(adsetSpend)) {
+    if (spend < 100) continue;
+    const parsed = parseKolAdset(adsetName);
+    if (!parsed) continue;
+    const { audience, kolName } = parsed;
+    if (!kolMap[kolName]) kolMap[kolName] = { audiences: {}, totalSpend: 0, adsetSet: new Set() };
+    if (!kolMap[kolName].audiences[audience]) kolMap[kolName].audiences[audience] = 0;
+    kolMap[kolName].audiences[audience] += spend;
+    kolMap[kolName].totalSpend += spend;
+    kolMap[kolName].adsetSet.add(adsetName);
+  }
+  return kolMap;
+}
+
+function buildKolAudienceBlock(ci, rawAds) {
+  const kolMap = buildKolAudienceStats(rawAds, ci);
+  const kolNames = Object.keys(kolMap).sort();
+
+  if (kolNames.length === 0) {
+    return `<div class="kol-audience-body">
+      <div style="color:var(--text3);font-size:13px;padding:8px 0">近30天內無符合條件的KOL興趣測試組合（需花費 > NT$100）</div>
+    </div>`;
+  }
+
+  let body = '';
+  for (const kolName of kolNames) {
+    const data = kolMap[kolName];
+    const audienceList = Object.entries(data.audiences).sort((a,b) => b[1] - a[1]);
+    const uniqueAudienceCount = audienceList.length;
+    const kolTotalSpend = data.totalSpend;
+    const kolAdsetCount = data.adsetSet.size;
+    const chips = audienceList.map(([aud, spend]) =>
+      `<div class="kol-audience-chip">${aud}<span class="chip-spend">NT$${Math.round(spend).toLocaleString()}</span></div>`
+    ).join('');
+    body += `
+      <div class="kol-person-block">
+        <div class="kol-person-name">
+          <span style="width:8px;height:8px;border-radius:50%;background:#6a1b9a;display:inline-block;flex-shrink:0"></span>
+          <strong>${kolName}</strong>
+          <span class="kol-person-meta">不重複受眾 <b style="color:#4a148c">${uniqueAudienceCount}</b> 組｜廣告組合 <b style="color:#4a148c">${kolAdsetCount}</b> 組｜花費 <b style="color:#4a148c">NT$${Math.round(kolTotalSpend).toLocaleString()}</b></span>
+        </div>
+        <div class="kol-audience-chips">${chips}</div>
+      </div>`;
+  }
+  return `<div class="kol-audience-body">${body}</div>`;
+}
+
+/* ══════════════════════════════════════════════
+   KOL 素材小計區塊
+══════════════════════════════════════════════ */
+function buildKolSummaryBlock(ci, rawAds) {
+  const kolAds = rawAds.filter(ad => {
+    if (parseFloat(ad.spend || 0) <= 0) return false;
+    const type = classType(ad.campaign_name, ci);
+    return isKolType(type, ad.ad_name);
+  });
+
+  if (kolAds.length === 0) {
+    return `<div class="kol-summary-body"><div style="color:var(--text3);font-size:13px">昨天無KOL廣告花費</div></div>`;
+  }
+
+  const merged = mergeAdsByName(kolAds, ci);
+  let totalSpend = 0, totalPurchase = 0, totalAcv = 0, totalCart = 0, totalImpressions = 0, totalClicks = 0;
+  for (const ad of merged) {
+    totalSpend += parseFloat(ad.spend || 0);
+    totalPurchase += adv(ad, 'purchase');
+    totalAcv += adacv(ad, 'purchase');
+    totalCart += adv(ad, 'add_to_cart');
+    totalImpressions += parseInt(ad.impressions || 0);
+    totalClicks += parseInt(ad.clicks || 0);
+  }
+  const totalCpa = totalPurchase > 0 ? totalSpend / totalPurchase : 0;
+  const totalRoas = totalSpend > 0 ? totalAcv / totalSpend : 0;
+  const totalCtr = totalImpressions > 0 ? totalClicks / totalImpressions * 100 : 0;
+
+  const fM = n => n > 0 ? 'NT$' + Math.round(n).toLocaleString() : '-';
+  const fX = n => n > 0 ? n.toFixed(2) + 'x' : '-';
+  const rc = r => r >= 3 ? 'var(--green)' : r >= 2 ? 'var(--amber)' : r > 0 ? 'var(--red)' : '#4a148c';
+  const cpaCl = (cpa) => { const t = CLIENTS[ci].cpa; return cpa <= 0 ? '#4a148c' : cpa < t.good ? 'var(--green)' : cpa < t.ok ? 'var(--amber)' : 'var(--red)'; };
+
+  const sortedAds = [...merged].sort((a, b) => parseFloat(b.spend || 0) - parseFloat(a.spend || 0));
+  const rows = sortedAds.map(ad => {
+    const sp = parseFloat(ad.spend || 0);
+    const pur = adv(ad, 'purchase');
+    const cpa = adcpa(ad, 'purchase');
+    const roas = sp > 0 ? adacv(ad, 'purchase') / sp : 0;
+    const dispName = (ad.ad_name || '').length > 35 ? (ad.ad_name || '').slice(0, 35) + '…' : (ad.ad_name || '未命名');
+    return `<tr>
+      <td style="padding:7px 12px"><div style="font-size:12px;font-weight:500;color:var(--text)">${dispName}</div></td>
+      <td style="padding:7px 12px;text-align:right">NT$${Math.round(sp).toLocaleString()}</td>
+      <td style="padding:7px 12px;text-align:right">${pur > 0 ? pur : '-'}</td>
+      <td style="padding:7px 12px;text-align:right;font-weight:700"><span style="color:${cpaCl(cpa)}">${fM(cpa)}</span></td>
+      <td style="padding:7px 12px;text-align:right;font-weight:600"><span style="color:${rc(roas)}">${fX(roas)}</span></td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="kol-summary-body">
+      <div class="kol-summary-grid">
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">KOL 總花費</div><div class="kol-summary-kpi-value" style="font-size:15px">NT$${Math.round(totalSpend).toLocaleString()}</div></div>
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">購買單數</div><div class="kol-summary-kpi-value">${totalPurchase > 0 ? totalPurchase : '-'}</div></div>
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">CPA</div><div class="kol-summary-kpi-value" style="font-size:15px;color:${cpaCl(totalCpa)}">${fM(totalCpa)}</div></div>
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">ROAS</div><div class="kol-summary-kpi-value" style="color:${rc(totalRoas)}">${fX(totalRoas)}</div></div>
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">加購次數</div><div class="kol-summary-kpi-value">${totalCart > 0 ? totalCart : '-'}</div></div>
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">CTR</div><div class="kol-summary-kpi-value">${totalCtr > 0 ? totalCtr.toFixed(2) + '%' : '-'}</div></div>
+        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">素材數（去重）</div><div class="kol-summary-kpi-value">${merged.length}</div></div>
+      </div>
+      <div style="margin-top:14px">
+        <table class="kol-summary-table">
+          <thead><tr>
+            <th>KOL 素材名稱</th>
+            <th style="text-align:right">花費</th>
+            <th style="text-align:right">購買</th>
+            <th style="text-align:right">CPA</th>
+            <th style="text-align:right">ROAS</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 function recommendAd(ad, ci) {
   const spend=parseFloat(ad.spend||0), cpa=adcpa(ad,'purchase'), roas=spend>0?adacv(ad,'purchase')/spend:0;
-  const purchase=adv(ad,'purchase'), cart=adv(ad,'add_to_cart');
+  const purchase=adv(ad,'purchase'), cart=adv(ad,'add_to_cart'), ctr=parseFloat(ad.ctr||0);
   const thr=CLIENTS[ci].cpa;
 
   if(spend<300) return {badge:'rec-watch',label:'觀察中',reason:`花費 NT$${Math.round(spend)}，資料不足`};
+
   if(purchase===0){
     if(spend>=1000&&cart===0) return {badge:'rec-kill',label:'立即暫停',reason:`花費 NT$${Math.round(spend)} 零購買零加購`};
-    if(cart>0) return {badge:'rec-recut',label:'優化落地頁',reason:`有 ${cart} 次加購但零購買`};
-    return {badge:'rec-watch',label:'觀察中',reason:`花費 NT$${Math.round(spend)} 尚無購買`};
+    if(cart>0) return {badge:'rec-recut',label:'優化落地頁',reason:`有 ${cart} 次加購但零購買，建議優化結帳流程`};
+    return {badge:'rec-watch',label:'觀察中',reason:`花費 NT$${Math.round(spend)} 尚無購買，繼續觀察`};
   }
+
   if(cpa<thr.good){
-    if(purchase>=5||roas>=3) return {badge:'rec-boost',label:'加大預算',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆，建議加預算`};
-    return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（優秀✅）維持現有預算`};
+    if(purchase>=10||roas>=4) return {badge:'rec-boost',label:'加大預算',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆 ROAS ${roas.toFixed(2)}x，明星素材建議加 20-30% 預算`};
+    if(purchase>=5)           return {badge:'rec-boost',label:'加大預算',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆，建議加大預算放量`};
+    return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆，維持現有預算`};
   }
   if(cpa<thr.ok){
-    if(roas>=2) return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（普通）ROAS ${roas.toFixed(2)}x，維持觀察`};
-    return {badge:'rec-watch',label:'持續觀察',reason:`CPA NT$${Math.round(cpa)}（普通）再觀察 2-3 天`};
+    if(purchase>=8&&roas>=3) return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（普通）購買 ${purchase} 筆 ROAS ${roas.toFixed(2)}x，整體表現不錯`};
+    if(roas>=3)              return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（普通）ROAS ${roas.toFixed(2)}x 達標，維持預算觀察`};
+    return {badge:'rec-watch',label:'持續觀察',reason:`CPA NT$${Math.round(cpa)}（普通）購買 ${purchase} 筆，建議再觀察 2-3 天`};
   }
-  if(roas<1.5) return {badge:'rec-kill',label:'重新剪輯',reason:`CPA NT$${Math.round(cpa)}（差⚠️）ROAS ${roas.toFixed(2)}x 偏低`};
-  return {badge:'rec-recut',label:'調整素材',reason:`CPA NT$${Math.round(cpa)}（差⚠️）購買 ${purchase} 筆`};
+  if(purchase>=15&&roas>=3) return {badge:'rec-watch',label:'持續觀察',reason:`CPA NT$${Math.round(cpa)}（偏高）但購買量大（${purchase}筆）且 ROAS ${roas.toFixed(2)}x，縮預算繼續觀察`};
+  if(roas<1.5)              return {badge:'rec-kill',label:'重新剪輯',reason:`CPA NT$${Math.round(cpa)}（差⚠️）ROAS ${roas.toFixed(2)}x 低於盈虧點，建議重新製作素材`};
+  return {badge:'rec-recut',label:'調整素材',reason:`CPA NT$${Math.round(cpa)}（差⚠️）購買 ${purchase} 筆，建議調整素材訴求`};
 }
 
 async function fetchInsights(accountId, s, e) {
@@ -453,14 +625,34 @@ async function fetchAdInsights(accountId, s, e) {
   return all;
 }
 
+async function fetchAdsetInsights(accountId, s, e) {
+  const end = e || s; let all = [];
+  const fields = 'adset_name,campaign_name,spend,actions,action_values,cost_per_action_type';
+  let url = `https://graph.facebook.com/v19.0/act_${accountId}/insights?fields=${fields}&time_range={"since":"${s}","until":"${end}"}&level=adset&limit=200&access_token=${TOKEN}`;
+  let pg = 0;
+  while (url && pg < 5) {
+    const res = await fetch(url); const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    if (data.data) all = all.concat(data.data);
+    url = data.paging?.next || null; pg++;
+  }
+  return all;
+}
+
 async function fetchClientData(ci) {
-  const client=CLIENTS[ci];
-  const{today,yesterday}=getDateRange();
-  const now=new Date();
-  const m1=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const client=CLIENTS[ci]; const{today,yesterday}=getDateRange();
+  const now=new Date(); const m1=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
   const res={today:[],yesterday:[],adsToday:[],adsYesterday:[],monthTotal:[],adsPrev:[],ads30d:[]};
+  const r30=getExtendedDateRange(30);
   const r15a=getExtendedDateRange(15);
   const r15b={since:getExtendedDateRange(30).since, until:getExtendedDateRange(16).since};
+
+  // 拉各帳號開啟中的 adset 名稱集合（只需一次 API，不用 batch）
+  const mergedActiveAdsetNames = new Set();
+  for (const acc of client.accounts) {
+    const names = await fetchActiveAdsetMap(acc).catch(() => new Set());
+    for (const n of names) mergedActiveAdsetNames.add(n);
+  }
 
   for(const acc of client.accounts){
     const[t,y,at,ay,mo,ap,a30a,a30b]=await Promise.all([
@@ -470,23 +662,33 @@ async function fetchClientData(ci) {
       fetchAdInsights(acc,yesterday).catch(()=>[]),
       fetchInsights(acc,m1,today).catch(()=>null),
       fetchAdInsights(acc,yesterday).catch(()=>[]),
-      fetchAdInsights(acc,r15a.since,r15a.until).catch(()=>[]),
-      fetchAdInsights(acc,r15b.since,r15b.until).catch(()=>[])
+      fetchAdInsights(acc,r15a.since,r15a.until).catch(e=>{console.warn('ads30d[0] err',e.message);return[];}),
+      fetchAdInsights(acc,r15b.since,r15b.until).catch(e=>{console.warn('ads30d[1] err',e.message);return[];})
     ]);
-    if(t) res.today.push(t);
-    if(y) res.yesterday.push(y);
-    if(mo) res.monthTotal.push(mo);
+    if(t)res.today.push(t); if(y)res.yesterday.push(y); if(mo)res.monthTotal.push(mo);
     res.adsToday=res.adsToday.concat(at||[]);
     res.adsYesterday=res.adsYesterday.concat(ay||[]);
     res.adsPrev=res.adsPrev.concat(ap||[]);
     res.ads30d=res.ads30d.concat(a30a||[]).concat(a30b||[]);
   }
-
+  const uniqAdsets=(ads)=>new Set(
+    ads.filter(a=>{
+      if(parseFloat(a.spend||0)<=0) return false;
+      const camp=(a.campaign_name||'').toUpperCase();
+      if(camp.includes('ASC')) return false;
+      if(camp.includes('RT')) return false;
+      return true;
+    }).map(a=>(a.adset_name||'').trim())
+    .filter(n=>n.length>0)
+  ).size;
   return{
     today:mergeInsights(res.today), yesterday:mergeInsights(res.yesterday),
     adsToday:res.adsToday, adsYesterday:res.adsYesterday,
     monthTotal:mergeInsights(res.monthTotal),
-    ads30d:res.ads30d
+    adsetCountToday:uniqAdsets(res.adsToday),
+    adsetCountYesterday:uniqAdsets(res.adsPrev),
+    ads30d:res.ads30d,
+    activeAdsetNames: mergedActiveAdsetNames
   };
 }
 
@@ -504,11 +706,11 @@ function chgBadge(a,b,lb=false){
   return`<span class="change-badge ${cls}">${p>0?'+':''}${p.toFixed(1)}%</span>`;
 }
 function row2(top,bot){return`${top}<br><small style="color:var(--text3)">${bot}</small>`;}
-const rc    = r => r>=3?'var(--green)':r>=2?'var(--amber)':r>0?'var(--red)':'var(--text3)';
-const fM    = n => n>0?'NT$'+Math.round(n).toLocaleString():'-';
-const fX    = n => n>0?n.toFixed(2)+'x':'-';
-const fP    = n => n>0?n.toFixed(1)+'%':'-';
-const cpaCl = (cpa,ci) => { const t=CLIENTS[ci].cpa; return cpa<=0?'var(--text3)':cpa<t.good?'var(--green)':cpa<t.ok?'var(--amber)':'var(--red)'; };
+const rc=(r)=>r>=3?'var(--green)':r>=2?'var(--amber)':r>0?'var(--red)':'var(--text3)';
+const fM=(n)=>n>0?'NT$'+Math.round(n).toLocaleString():'-';
+const fX=(n)=>n>0?n.toFixed(2)+'x':'-';
+const fP=(n)=>n>0?n.toFixed(1)+'%':'-';
+const cpaCl=(cpa,ci)=>{ const t=CLIENTS[ci].cpa; return cpa<=0?'var(--text3)':cpa<t.good?'var(--green)':cpa<t.ok?'var(--amber)':'var(--red)'; };
 
 function mergeAdsByName(rawAds, ci) {
   const map={};
@@ -530,7 +732,9 @@ function mergeAdsByName(rawAds, ci) {
         for(const item of ad[f]){const ex=base[f].find(x=>x.action_type===item.action_type);if(ex)ex.value=String(parseFloat(ex.value||0)+parseFloat(item.value||0));else base[f].push(JSON.parse(JSON.stringify(item)));}
       };
       mArr('actions');mArr('action_values');mArr('outbound_clicks');
-      mArr('video_play_actions');mArr('video_p25_watched_actions');mArr('video_p95_watched_actions');
+      mArr('video_play_actions');
+      mArr('video_p25_watched_actions');
+      mArr('video_p95_watched_actions');
       const imp=parseInt(base.impressions||0),clk=parseInt(base.clicks||0);
       base.ctr=imp>0?String((clk/imp*100).toFixed(4)):'0';
       const sp=parseFloat(base.spend||0); base.cost_per_action_type=[];
@@ -540,11 +744,17 @@ function mergeAdsByName(rawAds, ci) {
   return Object.values(map);
 }
 
-// ── AI 口述稿 ──
-const PROXY_URL = 'https://anthropic-proxy.fatry53968.workers.dev';
-const _aiReportCache = {};
-const _reportCache = {};
+function sumType(rawAds, type, ci){
+  let s=0,p=0,a=0,c=0;
+  for(const ad of rawAds){
+    if(parseFloat(ad.spend||0)<=0)continue;
+    if(classType(ad.campaign_name,ci)!==type)continue;
+    s+=parseFloat(ad.spend||0); p+=adv(ad,'purchase'); a+=adacv(ad,'purchase'); c+=adv(ad,'add_to_cart');
+  }
+  return{spend:s,purchase:p,acv:a,cart:c,cpa:p>0?s/p:0,roas:s>0?a/s:0};
+}
 
+/* AI 口述稿生成 */
 function buildAIPrompt(ci, todayData, adsToday, extra) {
   const client = CLIENTS[ci];
   const thr = client.cpa;
@@ -569,8 +779,10 @@ function buildAIPrompt(ci, todayData, adsToday, extra) {
   const daysLeft = daysInMonth - dayOfMonth;
   const needOrders = goalOrders > 0 ? Math.max(0, goalOrders - moPurchase) : 0;
   const achRate = goalOrders > 0 ? (moPurchase / goalOrders * 100) : 0;
+  const dailyAvg = dayOfMonth > 0 ? moPurchase / dayOfMonth : 0;
 
   const typeOrder = ['流量/互動/觀看','ASC','KOL','興趣','類似','RT','其他'];
+
   const typeStats = {};
   for (const t of typeOrder) {
     const s = sumType(adsToday, t, ci);
@@ -579,7 +791,7 @@ function buildAIPrompt(ci, todayData, adsToday, extra) {
 
   const adsetByType = {};
   for (const ad of adsToday) {
-    if (parseFloat(ad.spend||0) <= 0) continue;
+    if (parseFloat(ad.spend || 0) <= 0) continue;
     const type = classType(ad.campaign_name, ci);
     if (type === '__SKIP__') continue;
     if (!adsetByType[type]) adsetByType[type] = [];
@@ -593,17 +805,56 @@ function buildAIPrompt(ci, todayData, adsToday, extra) {
     });
   }
 
+  const ads14d = extra.ads30d || [];
+  const map14 = {};
+  for (const ad of ads14d) {
+    if (parseFloat(ad.spend || 0) <= 0) continue;
+    const type = classType(ad.campaign_name, ci);
+    if (type === '__SKIP__') continue;
+    const key = normName(ad.ad_name);
+    if (!map14[key]) {
+      map14[key] = JSON.parse(JSON.stringify(ad));
+      map14[key].ad_name = key;
+    } else {
+      const base = map14[key];
+      base.spend = String(parseFloat(base.spend || 0) + parseFloat(ad.spend || 0));
+      const mArr = (f) => {
+        if (!ad[f]) return; if (!base[f]) { base[f] = JSON.parse(JSON.stringify(ad[f])); return; }
+        for (const item of ad[f]) { const ex = base[f].find(x => x.action_type === item.action_type); if (ex) ex.value = String(parseFloat(ex.value || 0) + parseFloat(item.value || 0)); else base[f].push(JSON.parse(JSON.stringify(item))); }
+      };
+      mArr('actions'); mArr('action_values');
+      const sp = parseFloat(base.spend || 0); base.cost_per_action_type = [];
+      if (base.actions) for (const a of base.actions) { const v = parseFloat(a.value || 0); if (v > 0 && sp > 0) base.cost_per_action_type.push({ action_type: a.action_type, value: String((sp / v).toFixed(2)) }); }
+    }
+  }
+  const top14 = Object.values(map14)
+    .filter(ad => adv(ad, 'purchase') >= 3 && parseFloat(ad.spend || 0) >= 500)
+    .map(ad => ({
+      name: ad.ad_name,
+      spend: parseFloat(ad.spend || 0),
+      purchase: adv(ad, 'purchase'),
+      cpa: adcpa(ad, 'purchase'),
+      roas: parseFloat(ad.spend||0)>0 ? adacv(ad,'purchase')/parseFloat(ad.spend||0) : 0
+    }))
+    .sort((a, b) => b.spend - a.spend)
+    .slice(0, 6);
+
   const typeSummary = Object.entries(typeStats).map(([t, s]) => {
     const allAds = (adsetByType[t] || []).sort((a,b) => b.spend - a.spend);
     const topSpendAd = allAds[0];
+    const topPurchaseAd = [...allAds].sort((a,b) => b.purchase - a.purchase)[0];
+    const zeroBadAds = allAds.filter(a => a.purchase === 0 && a.spend >= 200);
     const hasOrderAds = allAds.filter(a => a.purchase > 0).sort((a,b) => b.purchase - a.purchase);
-    const zeroBadAds = allAds.filter(a => a.purchase === 0 && a.spend >= 300);
+
     let detail = `【${t}】總花費NT$${Math.round(s.spend)}，購買${s.purchase}單，整體CPA${s.cpa>0?'NT$'+Math.round(s.cpa):'無'}，ROAS${s.roas>0?s.roas.toFixed(2)+'x':'無'}`;
     if (topSpendAd) detail += `\n  → 花費最多：${topSpendAd.name}（NT$${Math.round(topSpendAd.spend)}，${topSpendAd.purchase}單${topSpendAd.cpa>0?'，CPA NT$'+Math.round(topSpendAd.cpa):'，零購買'}）`;
-    if (hasOrderAds.length > 0) detail += `\n  → 有轉單：${hasOrderAds.slice(0,5).map(a=>`${a.name}（${a.purchase}單，CPA NT$${Math.round(a.cpa)}）`).join('；')}`;
-    if (zeroBadAds.length > 0) detail += `\n  → 零購買組（${zeroBadAds.length}組）：${zeroBadAds.slice(0,6).map(a=>`${a.name}（NT$${Math.round(a.spend)}）`).join('、')}`;
+    if (topPurchaseAd && topPurchaseAd.purchase > 0 && topPurchaseAd.name !== topSpendAd?.name) detail += `\n  → 帶單最多：${topPurchaseAd.name}（花費NT$${Math.round(topPurchaseAd.spend)}，${topPurchaseAd.purchase}單，CPA NT$${Math.round(topPurchaseAd.cpa)}）`;
+    if (hasOrderAds.length > 0) detail += `\n  → 有轉單廣告組：${hasOrderAds.slice(0,5).map(a=>`${a.name}（NT$${Math.round(a.spend)}，${a.purchase}單，CPA NT$${Math.round(a.cpa)}）`).join('；')}`;
+    if (zeroBadAds.length > 0) detail += `\n  → 零購買廣告組（${zeroBadAds.length}組，合計NT$${Math.round(zeroBadAds.reduce((s,a)=>s+a.spend,0))}）：${zeroBadAds.slice(0,8).map(a=>`${a.name}（NT$${Math.round(a.spend)}）`).join('、')}`;
     return detail;
   }).join('\n');
+
+  const top14Str = top14.length > 0 ? top14.map(a=>`${a.name}（花費NT$${Math.round(a.spend)}，${a.purchase}單，CPA NT$${Math.round(a.cpa)}，ROAS ${a.roas.toFixed(2)}x）`).join('\n') : '無';
 
   return `你是一位資深的 Meta 廣告操作師，每天早上要向客戶報告昨天的廣告表現。
 請用「口語化、像在跟老闆面對面說話」的方式寫一份廣告日報，直接說重點，不要用條列式。
@@ -626,10 +877,13 @@ function buildAIPrompt(ci, todayData, adsToday, extra) {
 ## 月累計
 - 累計訂單：${moPurchase} 單
 - 累計營業額：${moAcv > 0 ? 'NT$' + Math.round(moAcv).toLocaleString() : '無資料'}
-${goalOrders > 0 ? `- 月目標：${goalOrders} 單，達成率 ${achRate.toFixed(0)}%，剩 ${daysLeft} 天，需再跑 ${needOrders} 單` : ''}
+${goalOrders > 0 ? `- 月目標：${goalOrders} 單，達成率 ${achRate.toFixed(0)}%，剩 ${daysLeft} 天，需再跑 ${needOrders} 單，日均約 ${dailyAvg.toFixed(0)} 單` : ''}
 
 ## 昨天各廣告類型分組表現
 ${typeSummary}
+
+## 近14天最佳素材（花費≥NT$500 且購買≥3單）
+${top14Str}
 
 ---
 
@@ -638,12 +892,14 @@ ${typeSummary}
 2. 每個類型都要點出具體數字
 3. 解釋原因：CPA偏高要說是哪幾組零購買拉高的
 4. 判斷力：花費少說「樣本不夠，繼續觀察」；表現好的說建議加預算
-5. 結構：整體概況 → 月目標進度 → 各類型逐一分析 → 今天行動建議
+5. 結構：整體概況 → 月目標進度 → 各類型逐一分析 → 近14天素材亮點 → 今天行動建議
 6. 長度：400-600字
 7. 直接給口述稿內容，不要用 markdown 格式，不要用 ** 粗體
 
 請開始寫：`;
 }
+
+const PROXY_URL = 'https://anthropic-proxy.fatry53968.workers.dev';
 
 async function generateAIReport(ci, todayData, adsToday, extra) {
   const containerId = `ai-report-text-${ci}`;
@@ -694,7 +950,7 @@ async function generateAIReport(ci, todayData, adsToday, extra) {
             if (!started) { started = true; if (statusEl) statusEl.style.display = 'none'; }
             el.textContent = fullText;
           }
-        } catch(e) {
+        } catch (e) {
           if (e.message && (e.message.startsWith('HTTP') || e.message.includes('API_KEY') || e.message.includes('quota'))) throw e;
         }
       }
@@ -708,6 +964,8 @@ async function generateAIReport(ci, todayData, adsToday, extra) {
     el.innerHTML = `<div class="ai-error-msg">⚠️ AI 生成失敗：${err.message}<br><br><button class="ai-regen-btn" onclick="regenAIReport(${ci})" style="margin-top:4px">↻ 重試</button></div>`;
   }
 }
+
+const _aiReportCache = {};
 
 function regenAIReport(ci) {
   const c = _reportCache[ci]; if (!c) return;
@@ -803,6 +1061,8 @@ function buildDailyReport(ci, todayData, adsToday, extra = {}) {
     </div>`;
 }
 
+const _reportCache = {};
+
 function refreshReport(ci) {
   const c = _reportCache[ci]; if (!c) return;
   document.getElementById('daily-report-' + ci).innerHTML = buildDailyReport(ci, c.todayData, c.adsToday, c.extra);
@@ -811,35 +1071,35 @@ function refreshReport(ci) {
 
 function buildCreativeSummary(ci, adsToday, adsYesterday) {
   const { today: d1, yesterday: d2 } = getDateRange();
-  const typeOrder = ['流量/互動/觀看','ASC','KOL','興趣','類似','RT','其他'];
+  const typeOrder = ['流量/互動/觀看', 'ASC', 'KOL', '興趣', '類似', 'RT', '其他'];
   const typeColor = { 'ASC':'#1565c0','KOL':'#6a1b9a','興趣':'#e65100','類似':'#2e7d32','RT':'#c62828','流量/互動/觀看':'#37474f','其他':'#546e7a' };
 
-  let grandT={spend:0,purchase:0,acv:0}, grandY={spend:0,purchase:0,acv:0};
+  let grandT = { spend: 0, purchase: 0, acv: 0 }, grandY = { spend: 0, purchase: 0, acv: 0 };
   const allTypes = typeOrder.filter(t => {
-    const st=sumType(adsToday,t,ci), sy=sumType(adsYesterday,t,ci);
-    if(st.spend>0){grandT.spend+=st.spend;grandT.purchase+=st.purchase;grandT.acv+=st.acv;}
-    if(sy.spend>0){grandY.spend+=sy.spend;grandY.purchase+=sy.purchase;grandY.acv+=sy.acv;}
-    return st.spend>0||sy.spend>0;
+    const st = sumType(adsToday, t, ci), sy = sumType(adsYesterday, t, ci);
+    if (st.spend > 0) { grandT.spend += st.spend; grandT.purchase += st.purchase; grandT.acv += st.acv; }
+    if (sy.spend > 0) { grandY.spend += sy.spend; grandY.purchase += sy.purchase; grandY.acv += sy.acv; }
+    return st.spend > 0 || sy.spend > 0;
   });
 
-  let rows='';
-  for(const typeName of allTypes){
-    const st=sumType(adsToday,typeName,ci), sy=sumType(adsYesterday,typeName,ci);
-    const color=typeColor[typeName]||'#546e7a';
-    const pctT=grandT.spend>0?st.spend/grandT.spend*100:0;
-    const pctY=grandY.spend>0?sy.spend/grandY.spend*100:0;
-    rows+=`<tr>
+  let rows = '';
+  for (const typeName of allTypes) {
+    const st = sumType(adsToday, typeName, ci), sy = sumType(adsYesterday, typeName, ci);
+    const color = typeColor[typeName] || '#546e7a';
+    const pctT = grandT.spend > 0 ? st.spend / grandT.spend * 100 : 0;
+    const pctY = grandY.spend > 0 ? sy.spend / grandY.spend * 100 : 0;
+    rows += `<tr>
       <td style="padding:9px 14px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span><b>${typeName}</b></td>
-      <td style="padding:9px 14px;text-align:right">${fM(st.spend)}<br><small style="color:var(--text3)">${fM(sy.spend)}</small><br>${chgBadge(st.spend,sy.spend,false)}</td>
-      <td style="padding:9px 14px;text-align:right">${row2(fP(pctT),fP(pctY))}</td>
-      <td style="padding:9px 14px;text-align:right">${row2(st.purchase>0?st.purchase:'-',sy.purchase>0?sy.purchase:'-')}</td>
-      <td style="padding:9px 14px;text-align:right"><span style="color:${cpaCl(st.cpa,ci)};font-weight:700">${fM(st.cpa)}</span><br><small style="color:var(--text3)">${fM(sy.cpa)}</small><br>${chgBadge(st.cpa,sy.cpa,true)}</td>
+      <td style="padding:9px 14px;text-align:right">${fM(st.spend)}<br><small style="color:var(--text3)">${fM(sy.spend)}</small><br>${chgBadge(st.spend, sy.spend, false)}</td>
+      <td style="padding:9px 14px;text-align:right">${row2(fP(pctT), fP(pctY))}</td>
+      <td style="padding:9px 14px;text-align:right">${row2(st.purchase > 0 ? st.purchase : '-', sy.purchase > 0 ? sy.purchase : '-')}</td>
+      <td style="padding:9px 14px;text-align:right"><span style="color:${cpaCl(st.cpa, ci)};font-weight:700">${fM(st.cpa)}</span><br><small style="color:var(--text3)">${fM(sy.cpa)}</small><br>${chgBadge(st.cpa, sy.cpa, true)}</td>
       <td style="padding:9px 14px;text-align:right;font-weight:600"><span style="color:${rc(st.roas)}">${fX(st.roas)}</span><br><small style="color:${rc(sy.roas)}">${fX(sy.roas)}</small></td>
     </tr>`;
   }
 
-  const gTR=grandT.spend>0?grandT.acv/grandT.spend:0, gYR=grandY.spend>0?grandY.acv/grandY.spend:0;
-  const gTC=grandT.purchase>0?grandT.spend/grandT.purchase:0, gYC=grandY.purchase>0?grandY.spend/grandY.purchase:0;
+  const gTR = grandT.spend > 0 ? grandT.acv / grandT.spend : 0, gYR = grandY.spend > 0 ? grandY.acv / grandY.spend : 0;
+  const gTC = grandT.purchase > 0 ? grandT.spend / grandT.purchase : 0, gYC = grandY.purchase > 0 ? grandY.spend / grandY.purchase : 0;
 
   return `<div style="font-size:11px;color:var(--text3);margin-bottom:6px">上排 = 昨天（${d1}）｜下排灰色 = 前天（${d2}）</div>
     <div class="metrics-table" style="margin-bottom:16px">
@@ -856,10 +1116,10 @@ function buildCreativeSummary(ci, adsToday, adsYesterday) {
           ${rows}
           <tr style="background:var(--surface2);font-weight:600;border-top:1.5px solid var(--border2)">
             <td style="padding:10px 14px">總計</td>
-            <td style="padding:10px 14px;text-align:right">${fM(grandT.spend)}<br><small style="color:var(--text3)">${fM(grandY.spend)}</small><br>${chgBadge(grandT.spend,grandY.spend)}</td>
+            <td style="padding:10px 14px;text-align:right">${fM(grandT.spend)}<br><small style="color:var(--text3)">${fM(grandY.spend)}</small><br>${chgBadge(grandT.spend, grandY.spend)}</td>
             <td style="padding:10px 14px;text-align:right">100%</td>
-            <td style="padding:10px 14px;text-align:right">${grandT.purchase>0?grandT.purchase:'-'}<br><small style="color:var(--text3)">${grandY.purchase>0?grandY.purchase:'-'}</small></td>
-            <td style="padding:10px 14px;text-align:right"><span style="color:${cpaCl(gTC,ci)};font-weight:700">${fM(gTC)}</span><br><small style="color:var(--text3)">${fM(gYC)}</small><br>${chgBadge(gTC,gYC,true)}</td>
+            <td style="padding:10px 14px;text-align:right">${grandT.purchase > 0 ? grandT.purchase : '-'}<br><small style="color:var(--text3)">${grandY.purchase > 0 ? grandY.purchase : '-'}</small></td>
+            <td style="padding:10px 14px;text-align:right"><span style="color:${cpaCl(gTC, ci)};font-weight:700">${fM(gTC)}</span><br><small style="color:var(--text3)">${fM(gYC)}</small><br>${chgBadge(gTC, gYC, true)}</td>
             <td style="padding:10px 14px;text-align:right;font-weight:600"><span style="color:${rc(gTR)}">${fX(gTR)}</span><br><small style="color:${rc(gYR)}">${fX(gYR)}</small></td>
           </tr>
         </tbody>
@@ -867,7 +1127,6 @@ function buildCreativeSummary(ci, adsToday, adsYesterday) {
     </div>`;
 }
 
-// ── 素材明細表 ──
 const _uiState = {};
 function getUiState(ci) {
   if (!_uiState[ci]) _uiState[ci] = { period: '1d', filterKol: 'all', sortBy: 'spend', sortDir: 'desc' };
@@ -883,15 +1142,15 @@ async function loadDetailPeriod(ci, period) {
   el.innerHTML = `<div class="period-loading">⏳ 載入數據中...</div>`;
   try {
     let since, until;
-    if (period === '7d') { const r=getExtendedDateRange(7); since=r.since; until=r.until; }
-    else if (period === '14d') { const r=getExtendedDateRange(14); since=r.since; until=r.until; }
-    else if (period === '30d') { const r=getExtendedDateRange(30); since=r.since; until=r.until; }
-    else { const { today }=getDateRange(); since=today; until=today; }
-    let all=[];
-    for (const acc of CLIENTS[ci].accounts) { const ads=await fetchAdInsights(acc,since,until); all=all.concat(ads); }
-    _periodCache[ci+'_'+period] = all;
+    if (period === '7d') { const r = getExtendedDateRange(7); since = r.since; until = r.until; }
+    else if (period === '14d') { const r = getExtendedDateRange(14); since = r.since; until = r.until; }
+    else if (period === '30d') { const r = getExtendedDateRange(30); since = r.since; until = r.until; }
+    else { const { today } = getDateRange(); since = today; until = today; }
+    let all = [];
+    for (const acc of CLIENTS[ci].accounts) { const ads = await fetchAdInsights(acc, since, until); all = all.concat(ads); }
+    _periodCache[ci + '_' + period] = all;
     renderFlatTable(ci, all);
-  } catch(e) { el.innerHTML=`<div class="period-loading" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`; }
+  } catch (e) { el.innerHTML = `<div class="period-loading" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`; }
 }
 
 function _syncPeriodButtons(ci, period) {
@@ -901,119 +1160,148 @@ function _syncPeriodButtons(ci, period) {
 function setKolFilter(ci, val) {
   getUiState(ci).filterKol = val;
   const period = getUiState(ci).period;
-  if (_periodCache[ci+'_'+period]) renderFlatTable(ci, _periodCache[ci+'_'+period]);
+  if (_periodCache[ci + '_' + period]) renderFlatTable(ci, _periodCache[ci + '_' + period]);
   document.querySelectorAll(`.filter-btn[data-client="${ci}"]`).forEach(b => {
-    b.classList.remove('active','kol-active','non-kol-active','all-active');
-    if(b.dataset.filter===val){b.classList.add('active');if(val==='kol')b.classList.add('kol-active');else if(val==='non-kol')b.classList.add('non-kol-active');else b.classList.add('all-active');}
+    b.classList.remove('active', 'kol-active', 'non-kol-active', 'all-active');
+    if (b.dataset.filter === val) { b.classList.add('active'); if (val === 'kol') b.classList.add('kol-active'); else if (val === 'non-kol') b.classList.add('non-kol-active'); else b.classList.add('all-active'); }
   });
 }
 
 function setSort(ci, field) {
   const s = getUiState(ci);
-  if(s.sortBy===field){s.sortDir=s.sortDir==='desc'?'asc':'desc';}
-  else{s.sortBy=field;s.sortDir=field==='cpa'?'asc':'desc';}
-  const period=s.period;
-  if(_periodCache[ci+'_'+period]) renderFlatTable(ci,_periodCache[ci+'_'+period]);
+  if (s.sortBy === field) { s.sortDir = s.sortDir === 'desc' ? 'asc' : 'desc'; }
+  else { s.sortBy = field; s.sortDir = field === 'cpa' ? 'asc' : 'desc'; }
+  const period = s.period;
+  if (_periodCache[ci + '_' + period]) renderFlatTable(ci, _periodCache[ci + '_' + period]);
 }
 
 function sortIcon(ci, field) {
-  const s=getUiState(ci);
-  if(s.sortBy!==field) return '<span class="sort-icon">⇅</span>';
-  return `<span class="sort-icon">${s.sortDir==='asc'?'▲':'▼'}</span>`;
+  const s = getUiState(ci);
+  if (s.sortBy !== field) return '<span class="sort-icon">⇅</span>';
+  return `<span class="sort-icon">${s.sortDir === 'asc' ? '▲' : '▼'}</span>`;
 }
 
+/* ★ 核心修改：renderFlatTable 加入素材強度欄 */
 function renderFlatTable(ci, rawAds) {
   const el = document.getElementById('creative-' + ci);
   const s = getUiState(ci);
   const { period, filterKol, sortBy, sortDir } = s;
   const { today: d1 } = getDateRange();
 
+  // 取得帳戶月花費（從 cache）
+  const cachedData = _reportCache[ci];
+  const monthSpend = cachedData?.extra?.monthTotal ? parseFloat(cachedData.extra.monthTotal.spend || 0) : 0;
+  // 用 ads30d insights 計算素材強度（不需額外 API）
+  const activeAdsetNames = cachedData?.extra?.activeAdsetNames || new Set();
+  const activeAdsetMap = buildActiveAdsetMapFromInsights(
+    cachedData?.adsToday || [], ci, activeAdsetNames
+  );
+
   let classifiedAds = mergeAdsByName(rawAds, ci)
-    .map(ad => ({ ...ad, _type: classType(ad._campaign||ad.campaign_name, ci) }))
+    .map(ad => ({ ...ad, _type: classType(ad._campaign || ad.campaign_name, ci) }))
     .filter(ad => ad._type !== '__SKIP__');
 
   if (filterKol === 'kol') classifiedAds = classifiedAds.filter(ad => isKolType(ad._type, ad.ad_name));
   if (filterKol === 'non-kol') classifiedAds = classifiedAds.filter(ad => !isKolType(ad._type, ad.ad_name));
 
-  const sortFn = (a,b) => {
-    let va,vb;
-    if(sortBy==='spend'){va=parseFloat(a.spend||0);vb=parseFloat(b.spend||0);}
-    else if(sortBy==='cpa'){va=adcpa(a,'purchase');vb=adcpa(b,'purchase');if(va===0)va=9999999;if(vb===0)vb=9999999;}
-    else if(sortBy==='purchase'){va=adv(a,'purchase');vb=adv(b,'purchase');}
-    else{va=parseFloat(a.spend||0);vb=parseFloat(b.spend||0);}
-    return sortDir==='asc'?va-vb:vb-va;
+  const sortFn = (a, b) => {
+    let va, vb;
+    if (sortBy === 'spend') { va = parseFloat(a.spend || 0); vb = parseFloat(b.spend || 0); }
+    else if (sortBy === 'cpa') { va = adcpa(a, 'purchase'); vb = adcpa(b, 'purchase'); if (va === 0) va = 9999999; if (vb === 0) vb = 9999999; }
+    else if (sortBy === 'purchase') { va = adv(a, 'purchase'); vb = adv(b, 'purchase'); }
+    else { va = parseFloat(a.spend || 0); vb = parseFloat(b.spend || 0); }
+    return sortDir === 'asc' ? va - vb : vb - va;
   };
   classifiedAds.sort(sortFn);
 
-  if(classifiedAds.length===0){el.innerHTML='<div class="period-loading" style="color:var(--text3)">此期間無廣告花費</div>';return;}
+  if (classifiedAds.length === 0) { el.innerHTML = '<div class="period-loading" style="color:var(--text3)">此期間無廣告花費</div>'; return; }
 
-  const globalMax = Math.max(...classifiedAds.map(a=>parseFloat(a.spend||0)),1);
-  let periodLabel = period==='7d'?`近7天（${getExtendedDateRange(7).since} ～ ${getExtendedDateRange(7).until}）`
-    :period==='14d'?`近14天（${getExtendedDateRange(14).since} ～ ${getExtendedDateRange(14).until}）`
-    :period==='30d'?`近30天（${getExtendedDateRange(30).since} ～ ${getExtendedDateRange(30).until}）`
-    :`昨天（${d1}）`;
+  const globalMax = Math.max(...classifiedAds.map(a => parseFloat(a.spend || 0)), 1);
+  let periodLabel = period === '7d' ? `近7天（${getExtendedDateRange(7).since} ～ ${getExtendedDateRange(7).until}）`
+    : period === '14d' ? `近14天（${getExtendedDateRange(14).since} ～ ${getExtendedDateRange(14).until}）`
+    : period === '30d' ? `近30天（${getExtendedDateRange(30).since} ～ ${getExtendedDateRange(30).until}）`
+    : `昨天（${d1}）`;
 
-  const filterLabel = filterKol==='kol'?'🌟 KOL 素材':filterKol==='non-kol'?'非 KOL 素材':'全部素材';
-  const thCls = (field) => `sortable-th${s.sortBy===field?' sort-active':''}`;
+  const filterLabel = filterKol === 'kol' ? '🌟 KOL 素材' : filterKol === 'non-kol' ? '非 KOL 素材' : '全部素材';
+  const thCls = (field) => `sortable-th${s.sortBy === field ? ' sort-active' : ''}`;
 
-  let rows='';
-  for(const ad of classifiedAds){
-    const isKol=isKolType(ad._type,ad.ad_name);
-    const spend=parseFloat(ad.spend||0);
-    const impressions=parseFloat(ad.impressions||0);
-    const outboundClicks=adob(ad);
-    const linkCtr=impressions>0?outboundClicks/impressions*100:0;
-    const purchase=adv(ad,'purchase');
-    const cpa=adcpa(ad,'purchase'), roas=spend>0?adacv(ad,'purchase')/spend:0;
-    const cartCpa=adcpa(ad,'add_to_cart');
-    const checkoutCpa=adcpa(ad,'initiate_checkout');
-    const vPlay=gvid(ad,'video_play_actions');
-    const vP25=gvid(ad,'video_p25_watched_actions');
-    const vP95=gvid(ad,'video_p95_watched_actions');
-    const vRetention=(vP25>0&&vP95>0)?(vP95/vP25*10):null;
-    const rec=recommendAd(ad,ci);
-    const barW=Math.round(spend/globalMax*60);
-    const dispName=(ad.ad_name||'').length>38?(ad.ad_name||'').slice(0,38)+'…':(ad.ad_name||'未命名');
-    const kolTag=isKol?'<span class="kol-tag">KOL</span>':'';
-    const rowClass=isKol?'class="kol-row"':'';
-    const retColor=vRetention!==null?(vRetention>=5?'var(--green)':vRetention>=3?'var(--amber)':'var(--red)'):'var(--text3)';
+  // 素材強度圖例
+  const tierLegend = `
+    <span style="font-size:11px;color:var(--text3);margin-left:8px">素材強度：</span>
+    <span class="tier-badge tier-T0" style="font-size:10px;width:auto;padding:1px 6px">T0</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥50組+月10萬</span>
+    <span class="tier-badge tier-T1" style="font-size:10px;width:auto;padding:1px 6px">T1</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥20組+月5萬</span>
+    <span class="tier-badge tier-T2" style="font-size:10px;width:auto;padding:1px 6px">T2</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥10組+月&lt;5萬</span>
+    <span class="tier-badge tier-T3" style="font-size:10px;width:auto;padding:1px 6px">T3</span><span style="font-size:10px;color:var(--text3)"> 其餘</span>`;
 
-    rows+=`<tr ${rowClass}>
+  let rows = '';
+  for (const ad of classifiedAds) {
+    const isKol = isKolType(ad._type, ad.ad_name);
+    const spend = parseFloat(ad.spend || 0);
+    const impressions = parseFloat(ad.impressions || 0);
+    const outboundClicks = adob(ad);
+    const linkCtr = impressions > 0 ? outboundClicks / impressions * 100 : 0;
+    const purchase = adv(ad, 'purchase');
+    const cpa = adcpa(ad, 'purchase'), roas = spend > 0 ? adacv(ad, 'purchase') / spend : 0;
+    const cartCpa = adcpa(ad, 'add_to_cart');
+    const checkoutCpa = adcpa(ad, 'initiate_checkout');
+    const vPlay = gvid(ad, 'video_play_actions');
+    const vP25  = gvid(ad, 'video_p25_watched_actions');
+    const vP95  = gvid(ad, 'video_p95_watched_actions');
+    const vRetention = (vP25 > 0 && vP95 > 0) ? (vP95 / vP25 * 10) : null;
+    const rec = recommendAd(ad, ci);
+    const barW = Math.round(spend / globalMax * 60);
+    const dispName = (ad.ad_name || '').length > 38 ? (ad.ad_name || '').slice(0, 38) + '…' : (ad.ad_name || '未命名');
+    const kolTag = isKol ? '<span class="kol-tag">KOL</span>' : '';
+    const rowClass = isKol ? 'class="kol-row"' : '';
+    const retColor = vRetention !== null ? (vRetention >= 5 ? 'var(--green)' : vRetention >= 3 ? 'var(--amber)' : 'var(--red)') : 'var(--text3)';
+
+    // ★ 計算素材強度
+    const tier = calcCreativeTier(ad.ad_name, activeAdsetMap, monthSpend);
+    const activeCount = activeAdsetMap.get(normName(ad.ad_name)) || 0;
+    const tierHtml = `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+      ${tierBadgeHtml(tier)}
+      <span style="font-size:9px;color:var(--text3);white-space:nowrap">${activeCount}組</span>
+    </div>`;
+
+    rows += `<tr ${rowClass}>
+      <td style="padding:8px 10px;text-align:center;white-space:nowrap">${tierHtml}</td>
       <td style="padding:8px 12px">
         <div style="display:flex;align-items:flex-start;gap:4px">
-          ${isKol?'<span class="kol-dot" style="margin-top:5px"></span>':''}
-          <div><div class="ad-name" title="${(ad.ad_name||'').replace(/</g,'&lt;')}">${dispName}${kolTag}</div></div>
+          ${isKol ? '<span class="kol-dot" style="margin-top:5px"></span>' : ''}
+          <div><div class="ad-name" title="${(ad.ad_name || '').replace(/</g, '&lt;')}">${dispName}${kolTag}</div></div>
         </div>
       </td>
       <td style="padding:8px 12px;text-align:right">NT$${Math.round(spend).toLocaleString()}<br><div class="spend-bar-wrap"><div class="spend-bar" style="width:${barW}px"></div></div></td>
-      <td style="padding:8px 12px;text-align:right">${linkCtr>0?linkCtr.toFixed(2)+'%':'-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${cartCpa>0?fM(cartCpa):'-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${checkoutCpa>0?fM(checkoutCpa):'-'}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:${s.sortBy==='purchase'?'700':'400'}">${purchase>0?purchase:'-'}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:700"><span style="color:${cpaCl(cpa,ci)}">${fM(cpa)}</span></td>
+      <td style="padding:8px 12px;text-align:right">${linkCtr > 0 ? linkCtr.toFixed(2) + '%' : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${cartCpa > 0 ? fM(cartCpa) : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${checkoutCpa > 0 ? fM(checkoutCpa) : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;font-weight:${s.sortBy === 'purchase' ? '700' : '400'}">${purchase > 0 ? purchase : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;font-weight:700"><span style="color:${cpaCl(cpa, ci)}">${fM(cpa)}</span></td>
       <td style="padding:8px 12px;text-align:right;font-weight:600;color:${rc(roas)}">${fX(roas)}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vPlay>0?Math.round(vPlay).toLocaleString():'-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP25>0?Math.round(vP25).toLocaleString():'-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP95>0?Math.round(vP95).toLocaleString():'-'}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:600;color:${retColor}">${vRetention!==null?vRetention.toFixed(1)+'成':'-'}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vPlay > 0 ? Math.round(vPlay).toLocaleString() : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP25 > 0 ? Math.round(vP25).toLocaleString() : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP95 > 0 ? Math.round(vP95).toLocaleString() : '-'}</td>
+      <td style="padding:8px 12px;text-align:right;font-weight:600;color:${retColor}">${vRetention !== null ? vRetention.toFixed(1) + '成' : '-'}</td>
       <td style="padding:8px 12px"><span class="rec-badge ${rec.badge}">${rec.label}</span></td>
     </tr>`;
   }
 
-  el.innerHTML=`
-    <div style="font-size:11px;color:var(--text3);margin-bottom:10px">
-      統計區間：${periodLabel}｜${filterLabel} 共 <b>${classifiedAds.length}</b> 組｜CPA 顏色：綠=優秀 橘=普通 紅=差｜25→95% 顏色：綠≥5成 橘≥3成 紅&lt;3成
+  el.innerHTML = `
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;flex-wrap:wrap;align-items:center;gap:4px">
+      <span>統計區間：${periodLabel}｜${filterLabel} 共 <b>${classifiedAds.length}</b> 組｜CPA 顏色：綠=優秀 橘=普通 紅=差｜25→95% 顏色：綠≥5成 橘≥3成 紅&lt;3成</span>
+      ${tierLegend}
     </div>
     <div class="metrics-table">
       <table class="creative-table">
         <thead><tr>
+          <th style="text-align:center;min-width:52px">強度</th>
           <th>廣告名稱</th>
-          <th style="text-align:right" class="${thCls('spend')}" onclick="setSort(${ci},'spend')">花費 ${sortIcon(ci,'spend')}</th>
+          <th style="text-align:right" class="${thCls('spend')}" onclick="setSort(${ci},'spend')">花費 ${sortIcon(ci, 'spend')}</th>
           <th style="text-align:right">CTR(連結)</th>
-          <th style="text-align:right">加購成本</th>
+          <th style="text-align:right">加到購物車成本</th>
           <th style="text-align:right">開始結帳成本</th>
-          <th style="text-align:right" class="${thCls('purchase')}" onclick="setSort(${ci},'purchase')">購買 ${sortIcon(ci,'purchase')}</th>
-          <th style="text-align:right" class="${thCls('cpa')}" onclick="setSort(${ci},'cpa')">CPA ★ ${sortIcon(ci,'cpa')}</th>
+          <th style="text-align:right" class="${thCls('purchase')}" onclick="setSort(${ci},'purchase')">購買 ${sortIcon(ci, 'purchase')}</th>
+          <th style="text-align:right" class="${thCls('cpa')}" onclick="setSort(${ci},'cpa')">CPA ★ ${sortIcon(ci, 'cpa')}</th>
           <th style="text-align:right">ROAS</th>
           <th style="text-align:right">播放次數</th>
           <th style="text-align:right">播放25%</th>
@@ -1027,61 +1315,61 @@ function renderFlatTable(ci, rawAds) {
 }
 
 function buildMetricsTable(t, y) {
-  const rows=[
-    ['花費金額',fmt(t?.spend,'money'),fmt(y?.spend,'money'),t?.spend,y?.spend,false,false],
-    ['CTR 點擊率',fmt(t?.ctr,'pct'),fmt(y?.ctr,'pct'),t?.ctr,y?.ctr,false,false],
-    ['連結點擊次數',fmt(t?.clicks),fmt(y?.clicks),t?.clicks,y?.clicks,false,false],
-    ['連外點擊次數',fmt(gob(t)),fmt(gob(y)),gob(t),gob(y),false,false],
-    ['曝光次數',fmt(t?.impressions),fmt(y?.impressions),t?.impressions,y?.impressions,false,false],
-    ['觸及人數',fmt(t?.reach),fmt(y?.reach),t?.reach,y?.reach,false,false],
-    ['加到購物車次數',fmt(gv(t,'add_to_cart')),fmt(gv(y,'add_to_cart')),gv(t,'add_to_cart'),gv(y,'add_to_cart'),false,false],
-    ['每次加購成本',fmt(gcpa(t,'add_to_cart'),'money'),fmt(gcpa(y,'add_to_cart'),'money'),gcpa(t,'add_to_cart'),gcpa(y,'add_to_cart'),false,true],
-    ['開始結帳次數',fmt(gv(t,'initiate_checkout')),fmt(gv(y,'initiate_checkout')),gv(t,'initiate_checkout'),gv(y,'initiate_checkout'),false,false],
-    ['購買次數',fmt(gv(t,'purchase')),fmt(gv(y,'purchase')),gv(t,'purchase'),gv(y,'purchase'),false,false],
-    ['購買轉換值',fmt(gacv(t,'purchase'),'money'),fmt(gacv(y,'purchase'),'money'),gacv(t,'purchase'),gacv(y,'purchase'),false,false],
-    ['CPA ★',fmt(gcpa(t,'purchase'),'money'),fmt(gcpa(y,'purchase'),'money'),gcpa(t,'purchase'),gcpa(y,'purchase'),false,true],
-    ['ROAS',fmt(t?.spend>0?gacv(t,'purchase')/t.spend:0,'x'),fmt(y?.spend>0?gacv(y,'purchase')/y.spend:0,'x'),t?.spend>0?gacv(t,'purchase')/t.spend:0,y?.spend>0?gacv(y,'purchase')/y.spend:0,false,false],
-    ['轉換率',fmt(t?.clicks>0?gv(t,'purchase')/t.clicks*100:0,'pct'),fmt(y?.clicks>0?gv(y,'purchase')/y.clicks*100:0,'pct'),t?.clicks>0?gv(t,'purchase')/t.clicks*100:0,y?.clicks>0?gv(y,'purchase')/y.clicks*100:0,false,false],
-    ['貼文互動次數',fmt(gv(t,'post_engagement')),fmt(gv(y,'post_engagement')),gv(t,'post_engagement'),gv(y,'post_engagement'),false,false],
-    ['影片播放次數',fmt(gvid(t,'video_play_actions')),fmt(gvid(y,'video_play_actions')),gvid(t,'video_play_actions'),gvid(y,'video_play_actions'),false,false],
-    ['影片播放25%',fmt(gvid(t,'video_p25_watched_actions')),fmt(gvid(y,'video_p25_watched_actions')),gvid(t,'video_p25_watched_actions'),gvid(y,'video_p25_watched_actions'),false,false],
-    ['影片播放100%',fmt(gvid(t,'video_p100_watched_actions')),fmt(gvid(y,'video_p100_watched_actions')),gvid(t,'video_p100_watched_actions'),gvid(y,'video_p100_watched_actions'),false,false],
+  const rows = [
+    ['花費金額', fmt(t?.spend, 'money'), fmt(y?.spend, 'money'), t?.spend, y?.spend, true, false],
+    ['CTR 點擊率', fmt(t?.ctr, 'pct'), fmt(y?.ctr, 'pct'), t?.ctr, y?.ctr, false, false],
+    ['連結點擊次數', fmt(t?.clicks), fmt(y?.clicks), t?.clicks, y?.clicks, false, false],
+    ['連外點擊次數', fmt(gob(t)), fmt(gob(y)), gob(t), gob(y), false, false],
+    ['曝光次數', fmt(t?.impressions), fmt(y?.impressions), t?.impressions, y?.impressions, false, false],
+    ['觸及人數', fmt(t?.reach), fmt(y?.reach), t?.reach, y?.reach, false, false],
+    ['加到購物車次數', fmt(gv(t, 'add_to_cart')), fmt(gv(y, 'add_to_cart')), gv(t, 'add_to_cart'), gv(y, 'add_to_cart'), false, false],
+    ['每次加購成本', fmt(gcpa(t, 'add_to_cart'), 'money'), fmt(gcpa(y, 'add_to_cart'), 'money'), gcpa(t, 'add_to_cart'), gcpa(y, 'add_to_cart'), true, true],
+    ['開始結帳次數', fmt(gv(t, 'initiate_checkout')), fmt(gv(y, 'initiate_checkout')), gv(t, 'initiate_checkout'), gv(y, 'initiate_checkout'), false, false],
+    ['購買次數', fmt(gv(t, 'purchase')), fmt(gv(y, 'purchase')), gv(t, 'purchase'), gv(y, 'purchase'), false, false],
+    ['購買轉換值', fmt(gacv(t, 'purchase'), 'money'), fmt(gacv(y, 'purchase'), 'money'), gacv(t, 'purchase'), gacv(y, 'purchase'), false, false],
+    ['CPA ★', `<span style="color:${gcpa(t,'purchase')>0&&gcpa(t,'purchase')>gcpa(y,'purchase')?'var(--red)':'inherit'};font-weight:700">${fmt(gcpa(t,'purchase'),'money')}</span>`, fmt(gcpa(y, 'purchase'), 'money'), gcpa(t, 'purchase'), gcpa(y, 'purchase'), true, true],
+    ['ROAS', fmt(t?.spend > 0 ? gacv(t, 'purchase') / t.spend : 0, 'x'), fmt(y?.spend > 0 ? gacv(y, 'purchase') / y.spend : 0, 'x'), t?.spend > 0 ? gacv(t, 'purchase') / t.spend : 0, y?.spend > 0 ? gacv(y, 'purchase') / y.spend : 0, false, false],
+    ['轉換率', fmt(t?.clicks > 0 ? gv(t, 'purchase') / t.clicks * 100 : 0, 'pct'), fmt(y?.clicks > 0 ? gv(y, 'purchase') / y.clicks * 100 : 0, 'pct'), t?.clicks > 0 ? gv(t, 'purchase') / t.clicks * 100 : 0, y?.clicks > 0 ? gv(y, 'purchase') / y.clicks * 100 : 0, false, false],
+    ['貼文互動次數', fmt(gv(t, 'post_engagement')), fmt(gv(y, 'post_engagement')), gv(t, 'post_engagement'), gv(y, 'post_engagement'), false, false],
+    ['影片播放次數', fmt(gvid(t, 'video_play_actions')), fmt(gvid(y, 'video_play_actions')), gvid(t, 'video_play_actions'), gvid(y, 'video_play_actions'), false, false],
+    ['影片播放25%', fmt(gvid(t, 'video_p25_watched_actions')), fmt(gvid(y, 'video_p25_watched_actions')), gvid(t, 'video_p25_watched_actions'), gvid(y, 'video_p25_watched_actions'), false, false],
+    ['影片播放100%', fmt(gvid(t, 'video_p100_watched_actions')), fmt(gvid(y, 'video_p100_watched_actions')), gvid(t, 'video_p100_watched_actions'), gvid(y, 'video_p100_watched_actions'), false, false],
   ];
   return `<div class="metrics-table"><table>
     <thead><tr><th>指標</th><th>昨天</th><th>前天</th><th>變化</th></tr></thead>
-    <tbody>${rows.map(([l,tv,yv,tR,yR,lb,skip])=>{
-      if(skip&&tR===0&&yR===0) return `<tr><td>${l}</td><td colspan="3" style="color:var(--text3)">暫無資料</td></tr>`;
-      return `<tr><td>${l}</td><td><b>${tv}</b></td><td style="color:var(--text3)">${yv}</td><td>${chgBadge(tR,yR,lb)}</td></tr>`;
-    }).join('')}</tbody>
+    <tbody>${rows.map(([l, tv, yv, tR, yR, lb, skip]) => {
+    if (skip && tR === 0 && yR === 0) return `<tr><td>${l}</td><td colspan="3" style="color:var(--text3)">暫無資料</td></tr>`;
+    return `<tr><td>${l}</td><td><b>${tv}</b></td><td style="color:var(--text3)">${yv}</td><td>${chgBadge(tR, yR, lb)}</td></tr>`;
+  }).join('')}</tbody>
   </table></div>`;
 }
 
 function buildTopKPIs(t, y) {
-  const st=t?.spend||0,sy=y?.spend||0;
-  const pt=gv(t,'purchase'),py=gv(y,'purchase');
-  const ct=gcpa(t,'purchase'),cy=gcpa(y,'purchase');
-  const rt=st>0?gacv(t,'purchase')/st:0,ry=sy>0?gacv(y,'purchase')/sy:0;
+  const st = t?.spend || 0, sy = y?.spend || 0;
+  const pt = gv(t, 'purchase'), py = gv(y, 'purchase');
+  const ct = gcpa(t, 'purchase'), cy = gcpa(y, 'purchase');
+  const rt = st > 0 ? gacv(t, 'purchase') / st : 0, ry = sy > 0 ? gacv(y, 'purchase') / sy : 0;
   return `<div class="day-compare">
     <div class="day-card"><h3><span class="day-dot-today"></span>昨天</h3>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(st,'money')}</div></div>
+        <div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(st, 'money')}</div></div>
         <div class="kpi"><div class="kpi-label">購買</div><div class="kpi-value">${fmt(pt)}</div></div>
-        <div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(ct,'money')}</div></div>
+        <div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(ct, 'money')}</div></div>
       </div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(rt,'x')}</div></div>
-        <div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(t?.ctr,'pct')}</div></div>
+        <div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(rt, 'x')}</div></div>
+        <div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(t?.ctr, 'pct')}</div></div>
       </div>
     </div>
     <div class="day-card"><h3><span class="day-dot-yest"></span>前天</h3>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(sy,'money')}</div></div>
+        <div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(sy, 'money')}</div></div>
         <div class="kpi"><div class="kpi-label">購買</div><div class="kpi-value">${fmt(py)}</div></div>
-        <div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(cy,'money')}</div></div>
+        <div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(cy, 'money')}</div></div>
       </div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(ry,'x')}</div></div>
-        <div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(y?.ctr,'pct')}</div></div>
+        <div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(ry, 'x')}</div></div>
+        <div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(y?.ctr, 'pct')}</div></div>
       </div>
     </div>
   </div>`;
@@ -1151,7 +1439,7 @@ function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extr
   document.getElementById('creative-summary-' + ci).innerHTML = buildCreativeSummary(ci, adsToday, adsYesterday);
   document.getElementById('kol-audience-' + ci).innerHTML = buildKolAudienceBlock(ci, extra.ads30d || []);
 
-  _periodCache[ci+'_1d'] = adsToday;
+  _periodCache[ci + '_1d'] = adsToday;
   _uiState[ci] = { period: '1d', filterKol: 'all', sortBy: 'spend', sortDir: 'desc' };
   renderFlatTable(ci, adsToday);
 }
@@ -1160,17 +1448,21 @@ async function loadClient(ci) {
   const dot = document.getElementById('status-dot-' + ci);
   const txt = document.getElementById('status-text-' + ci);
   const errEl = document.getElementById('error-' + ci);
-  dot.className='status-dot loading'; txt.textContent='資料載入中...'; errEl.innerHTML='';
+  dot.className = 'status-dot loading'; txt.textContent = '資料載入中...'; errEl.innerHTML = '';
   try {
     const data = await fetchClientData(ci);
-    dot.className='status-dot ok'; txt.textContent='資料已更新';
-    renderClient(ci, data.today, data.yesterday, data.adsToday||[], data.adsYesterday||[], {
+    dot.className = 'status-dot ok'; txt.textContent = '資料已更新';
+    renderClient(ci, data.today, data.yesterday, data.adsToday || [], data.adsYesterday || [], {
       monthTotal: data.monthTotal,
-      ads30d: data.ads30d||[]
+      adsetCountToday: data.adsetCountToday,
+      adsetCountYesterday: data.adsetCountYesterday,
+      ads30d: data.ads30d || [],
+      activeAdsetNames: data.activeAdsetNames || new Set(),
+
     });
-  } catch(e) {
-    dot.className='status-dot error'; txt.textContent='資料載入失敗';
-    errEl.innerHTML=`<div class="error-msg">⚠️ 無法取得資料：${e.message}</div>`;
+  } catch (e) {
+    dot.className = 'status-dot error'; txt.textContent = '資料載入失敗';
+    errEl.innerHTML = `<div class="error-msg">⚠️ 無法取得資料：${e.message}</div>`;
   }
 }
 
@@ -1181,8 +1473,8 @@ function loadAllData() {
 }
 
 function switchClient(idx) {
-  document.querySelectorAll('.client-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  document.querySelectorAll('.client-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('.client-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.client-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
 }
 
 loadAllData();
