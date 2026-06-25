@@ -5,166 +5,160 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>META 廣告數據儀表板｜丰丹 × 花現喜福</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #f7f6f3; --surface: #ffffff; --surface2: #f0eeea;
-    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
-    --text: #1a1a1a; --text2: #555; --text3: #888;
-    --blue: #1877f2; --green: #2e7d32; --red: #c62828; --amber: #e65100;
-    --green-bg: #e8f5e9; --red-bg: #ffebee; --amber-bg: #fff3e0; --blue-bg: #e3f2fd;
-    --radius: 10px; --radius-sm: 6px;
-  }
-  body { font-family: -apple-system,'Segoe UI',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f6f3; --surface: #ffffff; --surface2: #f0eeea;
+  --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
+  --text: #1a1a1a; --text2: #555; --text3: #888;
+  --blue: #1877f2; --green: #2e7d32; --red: #c62828; --amber: #e65100;
+  --green-bg: #e8f5e9; --red-bg: #ffebee; --amber-bg: #fff3e0; --blue-bg: #e3f2fd;
+  --radius: 10px; --radius-sm: 6px;
+}
+body { font-family: -apple-system,'Segoe UI',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.top-bar { background: #1877f2; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+.top-bar h1 { color: #fff; font-size: 17px; font-weight: 600; }
+.date-badge { background: rgba(255,255,255,0.2); color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 20px; }
+.refresh-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
+.refresh-btn:hover { background: rgba(255,255,255,0.3); }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.client-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.client-tab { padding: 10px 20px; border: 0.5px solid var(--border2); border-radius: var(--radius); cursor: pointer; background: var(--surface); font-size: 14px; font-weight: 500; color: var(--text2); transition: all 0.15s; }
+.client-tab.active { background: #1877f2; color: #fff; border-color: #1877f2; }
+.client-tab:hover:not(.active) { background: var(--surface2); }
+.client-panel { display: none; }
+.client-panel.active { display: block; }
+.status-bar { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+.status-dot.loading { background: #ffa000; animation: pulse 1s infinite; }
+.status-dot.ok { background: #2e7d32; }
+.status-dot.error { background: #c62828; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.error-msg { background: var(--red-bg); border: 0.5px solid #ef9a9a; border-radius: var(--radius); padding: 14px 16px; color: var(--red); font-size: 13px; margin-bottom: 16px; }
+.daily-report-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
+.daily-report-header { background: linear-gradient(135deg,#0d47a1 0%,#1877f2 100%); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.daily-report-header h2 { color: #fff; font-size: 15px; font-weight: 700; }
+.daily-report-body { padding: 18px 20px; }
+.report-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid var(--border); }
+.report-section:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
+.report-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+.report-loading { padding: 24px; text-align: center; color: var(--text3); font-size: 13px; }
+.kpi-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.kpi-chip { background: var(--surface2); border-radius: 8px; padding: 8px 14px; min-width: 90px; }
+.kpi-chip-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+.kpi-chip-value { font-size: 16px; font-weight: 700; color: var(--text); }
+.day-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.day-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.day-card h3 { font-size: 13px; font-weight: 500; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.day-dot-today { width:8px;height:8px;border-radius:50%;background:#1877f2; }
+.day-dot-yest  { width:8px;height:8px;border-radius:50%;background:#aaa; }
+.kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+.kpi { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; }
+.kpi-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.kpi-value { font-size: 18px; font-weight: 600; color: var(--text); }
+.section-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
+.metrics-table { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+.metrics-table table { width:100%;border-collapse:collapse;font-size:13px; }
+.metrics-table th { background:var(--surface2);padding:10px 14px;text-align:left;font-weight:500;color:var(--text2);font-size:12px;border-bottom:0.5px solid var(--border); }
+.metrics-table td { padding:9px 14px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:middle; }
+.metrics-table tr:last-child td { border-bottom:none; }
+.metrics-table tr:hover td { background:var(--surface2); }
+.change-badge { display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500; }
+.up  { background:var(--green-bg);color:var(--green); }
+.down{ background:var(--red-bg);color:var(--red); }
+.neu { background:var(--surface2);color:var(--text3); }
+.creative-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.controls-group { display: flex; align-items: center; gap: 6px; }
+.controls-label { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: 0.04em; white-space: nowrap; }
+.controls-divider { width: 1px; height: 20px; background: var(--border2); margin: 0 4px; }
+.period-btn { padding: 5px 14px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: 20px; cursor: pointer; background: transparent; color: var(--text2); transition: all 0.15s; white-space: nowrap; }
+.period-btn.active { background:#1877f2;color:#fff;border-color:#1877f2; }
+.period-btn:hover:not(.active) { background:var(--surface2); }
+.filter-btn { padding: 5px 13px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: 20px; cursor: pointer; background: transparent; color: var(--text2); transition: all 0.15s; white-space: nowrap; }
+.filter-btn:hover:not(.active) { background: var(--surface2); }
+.filter-btn.active.kol-active { background: #6a1b9a; color: #fff; border-color: #6a1b9a; }
+.filter-btn.active.non-kol-active { background: #e65100; color: #fff; border-color: #e65100; }
+.filter-btn.active.all-active { background: #1877f2; color: #fff; border-color: #1877f2; }
+.kol-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #6a1b9a; margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
+.period-loading { padding:16px;text-align:center;color:var(--text2);font-size:13px; }
+.creative-table { width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);border:0.5px solid var(--border);overflow:hidden; }
+.creative-table th { background:var(--surface2);padding:8px 12px;text-align:left;font-weight:500;color:var(--text3);font-size:11px;border-bottom:0.5px solid var(--border);white-space:nowrap; }
+.creative-table td { padding:8px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle; }
+.creative-table tr:last-child td { border-bottom:none; }
+.creative-table tr:hover td { background:var(--surface2); }
+.ad-name { font-weight:500;color:var(--text);max-width:220px;word-break:break-all;line-height:1.4; }
+.sortable-th { cursor: pointer; user-select: none; transition: color 0.12s; }
+.sortable-th:hover { color: #1877f2; }
+.sortable-th.sort-active { color: #1877f2; }
+.sort-icon { margin-left: 3px; font-size: 10px; opacity: 0.5; }
+.sortable-th.sort-active .sort-icon { opacity: 1; }
+.kol-row td:first-child { border-left: 3px solid #6a1b9a; }
+.kol-tag { display:inline-block; padding:1px 6px; border-radius:4px; background:#f3e5f5; color:#6a1b9a; font-size:10px; font-weight:700; margin-left:4px; vertical-align:middle; }
+.rec-badge { display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap; }
+.rec-kill  { background:#ffebee;color:#c62828; }
+.rec-recut { background:#fff3e0;color:#e65100; }
+.rec-keep  { background:#e8f5e9;color:#2e7d32; }
+.rec-boost { background:#e3f2fd;color:#1565c0; }
+.rec-watch { background:var(--surface2);color:var(--text2); }
+.spend-bar-wrap { width:60px;height:6px;background:var(--surface2);border-radius:3px;display:inline-block;vertical-align:middle; }
+.spend-bar { height:6px;border-radius:3px;background:#1877f2; }
+.tier-badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:22px; border-radius:6px; font-size:11px; font-weight:800; letter-spacing:0.02em; white-space:nowrap; }
+.tier-T0 { background:#1a237e; color:#fff; }
+.tier-T1 { background:#1565c0; color:#fff; }
+.tier-T2 { background:#e65100; color:#fff; }
+.tier-T3 { background:var(--surface2); color:var(--text2); border: 0.5px solid var(--border2); }
 
-  .top-bar { background: #1877f2; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .top-bar h1 { color: #fff; font-size: 17px; font-weight: 600; }
-  .date-badge { background: rgba(255,255,255,0.2); color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 20px; }
-  .refresh-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
-  .refresh-btn:hover { background: rgba(255,255,255,0.3); }
+/* ── KOL AUDIENCE BOX ── */
+.kol-audience-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+.kol-audience-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
+.kol-audience-header h3 { color: #fff; font-size: 14px; font-weight: 700; }
+.kol-audience-header span { color: rgba(255,255,255,0.75); font-size: 12px; }
+.kol-audience-body { padding: 16px 18px; }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+/* ── TOGGLE BUTTONS ── */
+.wc-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
+.wc-toggle-btn {
+  padding: 5px 18px; font-size: 12px; font-weight: 600;
+  border: 1px solid #ce93d8; border-radius: 20px;
+  background: transparent; color: #7b1fa2; cursor: pointer;
+  transition: all .15s; font-family: inherit;
+}
+.wc-toggle-btn.active { background: #7b1fa2; color: #fff; border-color: #7b1fa2; }
+.wc-toggle-btn:hover:not(.active) { background: #f3e5f5; }
 
-  .client-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-  .client-tab { padding: 10px 20px; border: 0.5px solid var(--border2); border-radius: var(--radius); cursor: pointer; background: var(--surface); font-size: 14px; font-weight: 500; color: var(--text2); transition: all 0.15s; }
-  .client-tab.active { background: #1877f2; color: #fff; border-color: #1877f2; }
-  .client-tab:hover:not(.active) { background: var(--surface2); }
+/* ── WORD CLOUD ── */
+.wordcloud-wrap {
+  position: relative; width: 100%; height: 380px; overflow: hidden;
+  background: linear-gradient(135deg,#fdf6ff 0%,#f5eeff 60%,#fffde7 100%);
+  border-radius: var(--radius-sm); border: 0.5px solid rgba(156,39,176,0.15);
+}
+.wc-word {
+  position: absolute; cursor: default; font-weight: 700; line-height: 1;
+  white-space: nowrap; transition: transform .18s; transform-origin: center;
+  font-family: -apple-system,'Noto Sans TC',sans-serif;
+}
+.wc-word:hover { transform: scale(1.18) !important; z-index: 20; }
+.wc-empty-msg { text-align: center; padding: 80px 20px; color: var(--text3); font-size: 13px; }
 
-  .client-panel { display: none; }
-  .client-panel.active { display: block; }
+/* ── KOL LIST VIEW ── */
+.kol-person-block { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid var(--border); }
+.kol-person-block:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
+.kol-person-name { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.kol-person-name strong { font-size: 14px; color: #6a1b9a; }
+.kol-person-meta { font-size: 12px; color: var(--text3); }
+.kol-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.kol-chip { background: #f3e5f5; border: 0.5px solid #ce93d8; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #4a148c; display: flex; align-items: center; gap: 5px; }
+.kol-chip-spend { font-size: 11px; color: #7b1fa2; font-weight: 600; }
 
-  .status-bar { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
-  .status-dot.loading { background: #ffa000; animation: pulse 1s infinite; }
-  .status-dot.ok { background: #2e7d32; }
-  .status-dot.error { background: #c62828; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+/* TOOLTIP */
+.wc-tooltip { position: fixed; z-index: 999; pointer-events: none; background: rgba(30,10,50,0.88); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; display: none; white-space: nowrap; }
 
-  .error-msg { background: var(--red-bg); border: 0.5px solid #ef9a9a; border-radius: var(--radius); padding: 14px 16px; color: var(--red); font-size: 13px; margin-bottom: 16px; }
-
-  .daily-report-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
-  .daily-report-header { background: linear-gradient(135deg,#0d47a1 0%,#1877f2 100%); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
-  .daily-report-header h2 { color: #fff; font-size: 15px; font-weight: 700; }
-  .daily-report-body { padding: 18px 20px; }
-  .report-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid var(--border); }
-  .report-section:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
-  .report-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
-  .report-loading { padding: 24px; text-align: center; color: var(--text3); font-size: 13px; }
-  .kpi-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
-  .kpi-chip { background: var(--surface2); border-radius: 8px; padding: 8px 14px; min-width: 90px; }
-  .kpi-chip-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
-  .kpi-chip-value { font-size: 16px; font-weight: 700; color: var(--text); }
-
-  .day-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .day-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
-  .day-card h3 { font-size: 13px; font-weight: 500; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-  .day-dot-today { width:8px;height:8px;border-radius:50%;background:#1877f2; }
-  .day-dot-yest  { width:8px;height:8px;border-radius:50%;background:#aaa; }
-  .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
-  .kpi { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; }
-  .kpi-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-  .kpi-value { font-size: 18px; font-weight: 600; color: var(--text); }
-
-  .section-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
-
-  .metrics-table { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-  .metrics-table table { width:100%;border-collapse:collapse;font-size:13px; }
-  .metrics-table th { background:var(--surface2);padding:10px 14px;text-align:left;font-weight:500;color:var(--text2);font-size:12px;border-bottom:0.5px solid var(--border); }
-  .metrics-table td { padding:9px 14px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:middle; }
-  .metrics-table tr:last-child td { border-bottom:none; }
-  .metrics-table tr:hover td { background:var(--surface2); }
-  .change-badge { display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500; }
-  .up  { background:var(--green-bg);color:var(--green); }
-  .down{ background:var(--red-bg);color:var(--red); }
-  .neu { background:var(--surface2);color:var(--text3); }
-
-  .creative-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .controls-group { display: flex; align-items: center; gap: 6px; }
-  .controls-label { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: 0.04em; white-space: nowrap; }
-  .controls-divider { width: 1px; height: 20px; background: var(--border2); margin: 0 4px; }
-
-  .period-btn { padding: 5px 14px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: 20px; cursor: pointer; background: transparent; color: var(--text2); transition: all 0.15s; white-space: nowrap; }
-  .period-btn.active { background:#1877f2;color:#fff;border-color:#1877f2; }
-  .period-btn:hover:not(.active) { background:var(--surface2); }
-
-  .filter-btn { padding: 5px 13px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: 20px; cursor: pointer; background: transparent; color: var(--text2); transition: all 0.15s; white-space: nowrap; }
-  .filter-btn:hover:not(.active) { background: var(--surface2); }
-  .filter-btn.active.kol-active { background: #6a1b9a; color: #fff; border-color: #6a1b9a; }
-  .filter-btn.active.non-kol-active { background: #e65100; color: #fff; border-color: #e65100; }
-  .filter-btn.active.all-active { background: #1877f2; color: #fff; border-color: #1877f2; }
-
-  .kol-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #6a1b9a; margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
-
-  .period-loading { padding:16px;text-align:center;color:var(--text2);font-size:13px; }
-
-  .creative-table { width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);border:0.5px solid var(--border);overflow:hidden; }
-  .creative-table th { background:var(--surface2);padding:8px 12px;text-align:left;font-weight:500;color:var(--text3);font-size:11px;border-bottom:0.5px solid var(--border);white-space:nowrap; }
-  .creative-table td { padding:8px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle; }
-  .creative-table tr:last-child td { border-bottom:none; }
-  .creative-table tr:hover td { background:var(--surface2); }
-  .ad-name { font-weight:500;color:var(--text);max-width:220px;word-break:break-all;line-height:1.4; }
-
-  .sortable-th { cursor: pointer; user-select: none; transition: color 0.12s; }
-  .sortable-th:hover { color: #1877f2; }
-  .sortable-th.sort-active { color: #1877f2; }
-  .sort-icon { margin-left: 3px; font-size: 10px; opacity: 0.5; }
-  .sortable-th.sort-active .sort-icon { opacity: 1; }
-
-  .kol-row td:first-child { border-left: 3px solid #6a1b9a; }
-  .kol-tag { display:inline-block; padding:1px 6px; border-radius:4px; background:#f3e5f5; color:#6a1b9a; font-size:10px; font-weight:700; margin-left:4px; vertical-align:middle; }
-
-  .rec-badge { display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap; }
-  .rec-kill  { background:#ffebee;color:#c62828; }
-  .rec-recut { background:#fff3e0;color:#e65100; }
-  .rec-keep  { background:#e8f5e9;color:#2e7d32; }
-  .rec-boost { background:#e3f2fd;color:#1565c0; }
-  .rec-watch { background:var(--surface2);color:var(--text2); }
-  .spend-bar-wrap { width:60px;height:6px;background:var(--surface2);border-radius:3px;display:inline-block;vertical-align:middle; }
-  .spend-bar { height:6px;border-radius:3px;background:#1877f2; }
-
-  .tier-badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:22px; border-radius:6px; font-size:11px; font-weight:800; letter-spacing:0.02em; white-space:nowrap; }
-  .tier-T0 { background:#1a237e; color:#fff; }
-  .tier-T1 { background:#1565c0; color:#fff; }
-  .tier-T2 { background:#e65100; color:#fff; }
-  .tier-T3 { background:var(--surface2); color:var(--text2); border: 0.5px solid var(--border2); }
-
-  .kol-audience-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-  .kol-audience-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
-  .kol-audience-header h3 { color: #fff; font-size: 14px; font-weight: 700; }
-  .kol-audience-header span { color: rgba(255,255,255,0.75); font-size: 12px; }
-  .kol-audience-body { padding: 16px 18px; }
-  .kol-person-block { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid var(--border); }
-  .kol-person-block:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
-  .kol-person-name { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .kol-person-name strong { font-size: 14px; color: #6a1b9a; }
-  .kol-person-meta { font-size: 12px; color: var(--text3); }
-  .kol-audience-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .kol-audience-chip { background: #f3e5f5; border: 0.5px solid #ce93d8; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #4a148c; display: flex; align-items: center; gap: 5px; }
-  .kol-audience-chip .chip-spend { font-size: 11px; color: #7b1fa2; font-weight: 600; }
-
-  .kol-summary-box { background: var(--surface); border: 0.5px solid #ce93d8; border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-  .kol-summary-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 10px 16px; }
-  .kol-summary-header h3 { color: #fff; font-size: 13px; font-weight: 700; }
-  .kol-summary-body { padding: 14px 16px; }
-  .kol-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
-  .kol-summary-kpi { background: #f3e5f5; border-radius: 8px; padding: 10px 14px; }
-  .kol-summary-kpi-label { font-size: 11px; color: #7b1fa2; margin-bottom: 4px; }
-  .kol-summary-kpi-value { font-size: 17px; font-weight: 700; color: #4a148c; }
-  .kol-summary-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:12px; }
-  .kol-summary-table th { background:#f3e5f5; padding:7px 12px; text-align:left; font-weight:600; color:#6a1b9a; font-size:11px; border-bottom:0.5px solid #ce93d8; }
-  .kol-summary-table td { padding:7px 12px; border-bottom:0.5px solid var(--border); color:var(--text); vertical-align:middle; }
-  .kol-summary-table tr:last-child td { border-bottom:none; }
-  .kol-summary-table tr:hover td { background:#fce4ec; }
-
-  .footer { text-align:center;padding:20px;font-size:12px;color:var(--text3); }
-
-  @media (max-width:600px) {
-    .day-compare { grid-template-columns:1fr; }
-    .kpi-row { grid-template-columns:repeat(2,1fr); }
-    .top-bar h1 { font-size:15px; }
-    .kpi-chips { gap:6px; }
-    .kpi-chip { min-width:70px;padding:6px 10px; }
-    .creative-controls { gap: 6px; }
-  }
+.footer { text-align:center;padding:20px;font-size:12px;color:var(--text3); }
+@media (max-width:600px) {
+  .day-compare { grid-template-columns:1fr; }
+  .kpi-row { grid-template-columns:repeat(2,1fr); }
+  .top-bar h1 { font-size:15px; }
+  .wordcloud-wrap { height: 260px; }
+}
 </style>
 </head>
 <body>
@@ -195,380 +189,352 @@
 </div>
 
 <div class="footer">資料來源：META Marketing API｜每次重新整理抓取最新數據</div>
+<div id="wc-tooltip" class="wc-tooltip"></div>
 
 <script>
 const TOKEN = 'EAAUPmHiPNZCsBRokNCDohk5rgjRMKvrIDwk3yhLAZCIhrpYk67ms1D6Jos92H5x2G4jVBJhnIQzeZC0KKDcg4CI19vSjDdjrw1uaDCjUFZCtl0tJmPzTJLyzECm4rfQmfmhSCCHVTQduWSScNRP65ypHEeWYvjDmKUrWIjVogvsncZCSaNh1gjLV1AZAeGeAZDZD';
 
 const CLIENTS = [
-  {
-    name: '丰丹嚴選本舖',
-    accounts: ['8977185638960433'],
-    cpa: { good: 850, ok: 1200 }
-  },
-  {
-    name: '花現喜福',
-    accounts: ['1203680740493775'],
-    cpa: { good: 800, ok: 1000 }
-  }
+  { name:'丰丹嚴選本舖', accounts:['8977185638960433'],   cpa:{ good:850, ok:1200 } },
+  { name:'花現喜福',     accounts:['1203680740493775'],   cpa:{ good:800, ok:1000 } }
 ];
-
-function saveGoal(ci,field,val){try{localStorage.setItem('goal_fd_'+ci+'_'+field,val);}catch(e){}}
-function loadGoal(ci,field){try{return parseFloat(localStorage.getItem('goal_fd_'+ci+'_'+field)||0);}catch(e){return 0;}}
 
 const FIELDS = 'spend,impressions,clicks,ctr,reach,frequency,actions,action_values,cost_per_action_type,video_p25_watched_actions,video_p50_watched_actions,video_p100_watched_actions,video_play_actions,outbound_clicks';
 const AD_FIELDS = 'ad_name,adset_name,campaign_name,spend,impressions,clicks,ctr,actions,action_values,cost_per_action_type,outbound_clicks,video_play_actions,video_p25_watched_actions,video_p95_watched_actions';
 
 function getDateRange() {
-  const now = new Date();
-  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  const yest = new Date(now); yest.setDate(yest.getDate()-1);
-  const dayB = new Date(now); dayB.setDate(dayB.getDate()-2);
+  const now=new Date(), fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const yest=new Date(now); yest.setDate(yest.getDate()-1);
+  const dayB=new Date(now); dayB.setDate(dayB.getDate()-2);
   return { today:fmt(yest), yesterday:fmt(dayB) };
 }
 function getExtendedDateRange(days) {
-  const now = new Date();
-  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  const end = new Date(now); end.setDate(end.getDate()-1);
-  const start = new Date(now); start.setDate(start.getDate()-days);
+  const now=new Date(), fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const end=new Date(now); end.setDate(end.getDate()-1);
+  const start=new Date(now); start.setDate(start.getDate()-days);
   return { since:fmt(start), until:fmt(end) };
 }
 
-const gv  = (d,k) => { if(!d?.actions) return 0; const a=d.actions.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
-const gcpa= (d,k) => { if(!d?.cost_per_action_type) return 0; const a=d.cost_per_action_type.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
-const gacv= (d,k) => { if(!d?.action_values) return 0; const a=d.action_values.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
-const gvid= (d,f) => { if(!d?.[f]) return 0; return d[f].reduce((s,x)=>s+parseFloat(x.value||0),0); };
-const gob = (d)   => { if(!d?.outbound_clicks) return 0; return d.outbound_clicks.reduce((s,x)=>s+parseFloat(x.value||0),0); };
-const adv = (ad,k)=> gv(ad,k);
-const adcpa=(ad,k)=> gcpa(ad,k);
-const adacv=(ad,k)=> gacv(ad,k);
-const adob = (ad) => gob(ad);
+const gv  =(d,k)=>{ if(!d?.actions)return 0; const a=d.actions.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
+const gcpa=(d,k)=>{ if(!d?.cost_per_action_type)return 0; const a=d.cost_per_action_type.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
+const gacv=(d,k)=>{ if(!d?.action_values)return 0; const a=d.action_values.find(x=>x.action_type===k); return a?parseFloat(a.value):0; };
+const gvid=(d,f)=>{ if(!d?.[f])return 0; return d[f].reduce((s,x)=>s+parseFloat(x.value||0),0); };
+const gob =(d)  =>{ if(!d?.outbound_clicks)return 0; return d.outbound_clicks.reduce((s,x)=>s+parseFloat(x.value||0),0); };
+const adv =(ad,k)=>gv(ad,k);
+const adcpa=(ad,k)=>gcpa(ad,k);
+const adacv=(ad,k)=>gacv(ad,k);
+const adob=(ad)=>gob(ad);
 
 function mergeInsights(arr) {
-  if (!arr||arr.length===0) return null;
-  const res = {};
-  for (const k of ['spend','impressions','clicks','reach']) res[k]=arr.reduce((s,d)=>s+parseFloat(d[k]||0),0);
-  res.ctr = res.impressions>0?res.clicks/res.impressions*100:0;
-  const ma = (field) => {
-    const c={};
-    for (const d of arr) if(d[field]) for(const a of d[field]) c[a.action_type]=(c[a.action_type]||0)+parseFloat(a.value||0);
-    return Object.entries(c).map(([action_type,value])=>({action_type,value:String(value)}));
-  };
+  if(!arr||arr.length===0) return null;
+  const res={};
+  for(const k of ['spend','impressions','clicks','reach']) res[k]=arr.reduce((s,d)=>s+parseFloat(d[k]||0),0);
+  res.ctr=res.impressions>0?res.clicks/res.impressions*100:0;
+  const ma=(field)=>{const c={};for(const d of arr) if(d[field]) for(const a of d[field]) c[a.action_type]=(c[a.action_type]||0)+parseFloat(a.value||0);return Object.entries(c).map(([action_type,value])=>({action_type,value:String(value)}));};
   res.actions=ma('actions'); res.action_values=ma('action_values');
   res.cost_per_action_type=[];
-  for (const a of res.actions) { const v=parseFloat(a.value); if(v>0&&res.spend>0) res.cost_per_action_type.push({action_type:a.action_type,value:String((res.spend/v).toFixed(2))}); }
-  for (const vf of ['video_p25_watched_actions','video_p50_watched_actions','video_p100_watched_actions','video_play_actions']) {
-    const c={};
-    for(const d of arr) if(d[vf]) for(const a of d[vf]) c[a.action_type||'v']=(c[a.action_type||'v']||0)+parseFloat(a.value||0);
-    res[vf]=Object.entries(c).map(([action_type,value])=>({action_type,value:String(value)}));
-  }
-  const oc={};
-  for(const d of arr) if(d.outbound_clicks) for(const a of d.outbound_clicks) oc[a.action_type||'l']=(oc[a.action_type||'l']||0)+parseFloat(a.value||0);
+  for(const a of res.actions){const v=parseFloat(a.value);if(v>0&&res.spend>0)res.cost_per_action_type.push({action_type:a.action_type,value:String((res.spend/v).toFixed(2))});}
+  for(const vf of ['video_p25_watched_actions','video_p50_watched_actions','video_p100_watched_actions','video_play_actions']){const c={};for(const d of arr)if(d[vf])for(const a of d[vf])c[a.action_type||'v']=(c[a.action_type||'v']||0)+parseFloat(a.value||0);res[vf]=Object.entries(c).map(([action_type,value])=>({action_type,value:String(value)}));}
+  const oc={};for(const d of arr)if(d.outbound_clicks)for(const a of d.outbound_clicks)oc[a.action_type||'l']=(oc[a.action_type||'l']||0)+parseFloat(a.value||0);
   res.outbound_clicks=Object.entries(oc).map(([action_type,value])=>({action_type,value:String(value)}));
   return res;
 }
 
-function normName(name) { if(!name) return '未命名'; return name.replace(/(\s*-\s*複本)+\s*$/g,'').trim(); }
+function normName(name){if(!name)return'未命名';return name.replace(/(\s*-\s*複本)+\s*$/g,'').trim();}
 
-function classType(camp, ci) {
-  const t = (camp || '').toUpperCase();
-  if (t.includes('素材')) return '__SKIP__';
-  if (
-    (t.includes('互動') && !t.includes('轉換')) ||
-    t.includes('流量') ||
-    t.includes('觀看')
-  ) return '流量/互動/觀看';
-  if (t.includes('ASC')) return 'ASC';
-  if (t.includes('KOL')) return 'KOL';
-  if (t.includes('類似')) return '類似';
-  if (t.includes('RT'))   return 'RT';
-  if (t.includes('興趣')) return '興趣';
-  return '其他';
+function classType(camp,ci){
+  const t=(camp||'').toUpperCase();
+  if(t.includes('素材'))return'__SKIP__';
+  if((t.includes('互動')&&!t.includes('轉換'))||t.includes('流量')||t.includes('觀看'))return'流量/互動/觀看';
+  if(t.includes('ASC'))return'ASC';
+  if(t.includes('KOL'))return'KOL';
+  if(t.includes('類似'))return'類似';
+  if(t.includes('RT'))return'RT';
+  if(t.includes('興趣'))return'興趣';
+  return'其他';
 }
 
-function isKolType(type, adName) {
-  if (type === 'KOL') return true;
-  if (adName && adName.toUpperCase().includes('KOL')) return true;
-  return false;
+function isKolType(type,adName){return type==='KOL'||(adName||'').toUpperCase().includes('KOL');}
+
+function calcCreativeTier(adName,activeAdsetMap,monthSpend){
+  const count=activeAdsetMap.get(normName(adName))||0,ms=monthSpend||0;
+  if(count>=50&&ms>=100000)return'T0';
+  if(count>=20&&ms>=50000)return'T1';
+  if(count>=10&&ms<50000)return'T2';
+  return'T3';
+}
+function tierBadgeHtml(tier){return`<span class="tier-badge tier-${tier}">${tier}</span>`;}
+
+async function fetchActiveAdsetMap(accountId){
+  let adsets=[],url=`https://graph.facebook.com/v19.0/act_${accountId}/adsets?fields=id,name,effective_status,campaign{name}&effective_status=["ACTIVE"]&limit=200&access_token=${TOKEN}`,pg=0;
+  while(url&&pg<10){const res=await fetch(url);const data=await res.json();if(data.error)return new Set();if(data.data)adsets=adsets.concat(data.data);url=data.paging?.next||null;pg++;}
+  const v=new Set();
+  for(const a of adsets){const c=(a.campaign?.name||'').toUpperCase();if(c.includes('素材')||c.includes('ASC')||c.includes('RT')||c.includes('互動')||c.includes('流量')||c.includes('觀看'))continue;v.add(a.name.trim());}
+  return v;
 }
 
-function calcCreativeTier(adName, activeAdsetMap, monthSpend) {
-  const count = activeAdsetMap.get(normName(adName)) || 0;
-  const ms = monthSpend || 0;
-  if (count >= 50 && ms >= 100000) return 'T0';
-  if (count >= 20 && ms >= 50000)  return 'T1';
-  if (count >= 10 && ms < 50000)   return 'T2';
-  return 'T3';
-}
-
-function tierBadgeHtml(tier) {
-  return `<span class="tier-badge tier-${tier}">${tier}</span>`;
-}
-
-async function fetchActiveAdsetMap(accountId) {
-  const adsetFields = 'id,name,effective_status,campaign{name}';
-  let adsets = [];
-  let url = `https://graph.facebook.com/v19.0/act_${accountId}/adsets?fields=${adsetFields}&effective_status=["ACTIVE"]&limit=200&access_token=${TOKEN}`;
-  let pg = 0;
-  while (url && pg < 10) {
-    url = url.replace(/graph\.facebook\.com\/v\d+\.\d+\//, 'graph.facebook.com/v19.0/');
-    const res = await fetch(url); const data = await res.json();
-    if (data.error) { console.warn(`[Tier] err act_${accountId}:`, data.error.message); return new Set(); }
-    if (data.data) adsets = adsets.concat(data.data);
-    url = data.paging?.next || null; pg++;
+function buildActiveAdsetMapFromInsights(adsToday,ci,activeAdsetNames){
+  const m=new Map();
+  for(const ad of adsToday){
+    if(parseFloat(ad.spend||0)<=0)continue;
+    const type=classType(ad.campaign_name,ci);
+    if(type==='__SKIP__')continue;
+    const camp=(ad.campaign_name||'').toUpperCase();
+    if(camp.includes('RT')||camp.includes('ASC'))continue;
+    const key=(ad.adset_name||'').trim();if(!key)continue;
+    if(activeAdsetNames&&activeAdsetNames.size>0&&!activeAdsetNames.has(key))continue;
+    const n=normName(ad.ad_name);
+    if(!m.has(n))m.set(n,new Set());
+    m.get(n).add(key);
   }
-  const validAdsetNames = new Set();
-  for (const adset of adsets) {
-    const campName = (adset.campaign?.name || '').toUpperCase();
-    if (campName.includes('素材')) continue;
-    if (campName.includes('ASC')) continue;
-    if (campName.includes('RT')) continue;
-    if (campName.includes('互動') || campName.includes('流量') || campName.includes('觀看')) continue;
-    validAdsetNames.add(adset.name.trim());
-  }
-  console.log(`[Tier] act_${accountId} active adsets=${adsets.length} valid=${validAdsetNames.size}`);
-  return validAdsetNames;
+  const r=new Map();for(const[k,s]of m)r.set(k,s.size);return r;
 }
 
-function buildActiveAdsetMapFromInsights(adsToday, ci, activeAdsetNames) {
-  const adNameToAdsetSet = new Map();
-  for (const ad of adsToday) {
-    if (parseFloat(ad.spend || 0) <= 0) continue;
-    const type = classType(ad.campaign_name, ci);
-    if (type === '__SKIP__') continue;
-    const campName = (ad.campaign_name || '').toUpperCase();
-    if (campName.includes('RT')) continue;
-    if (campName.includes('ASC')) continue;
-    const adsetKey = (ad.adset_name || '').trim();
-    if (!adsetKey) continue;
-    if (activeAdsetNames && activeAdsetNames.size > 0 && !activeAdsetNames.has(adsetKey)) continue;
-    const key = normName(ad.ad_name);
-    if (!adNameToAdsetSet.has(key)) adNameToAdsetSet.set(key, new Set());
-    adNameToAdsetSet.get(key).add(adsetKey);
-  }
-  const result = new Map();
-  for (const [name, set] of adNameToAdsetSet) result.set(name, set.size);
-  return result;
+// ============================================================
+// KOL 受眾解析
+// ============================================================
+function parseKolAdset(adsetName,ci){
+  const name=(adsetName||'').trim();
+  if(name.toUpperCase().includes('RT'))return null;
+  // ci=0 全國麗園 用｜，ci=1 如邑堂 用-
+  const parts=ci===0?name.split(/\s*[｜|]\s*/):name.split(/\s*-\s*/);
+  if(parts.length<3)return null;
+  if(!parts[0].includes('興趣'))return null;
+  let kolIdx=-1;
+  for(let i=1;i<parts.length;i++){if(parts[i].toUpperCase().includes('KOL')){kolIdx=i;break;}}
+  if(kolIdx===-1)return null;
+  const audience=parts.slice(1,kolIdx).join(ci===0?'｜':' - ').trim();
+  if(!audience)return null;
+  const kolName=parts[kolIdx].replace(/^.*?KOL\s*/i,'').trim();
+  if(!kolName)return null;
+  return{audience,kolName};
 }
 
-function parseKolAdset(adsetName, ci) {
-  const name = (adsetName || '').trim();
-  if (name.toUpperCase().includes('RT')) return null;
-
-  let parts = [];
-  if (ci === 0) {
-    parts = name.split(/\s*[｜|]\s*/);
-  } else {
-    parts = name.split(/\s*-\s*/);
+function buildKolMaps(rawAds,ci){
+  const adsetSpend={};
+  for(const ad of rawAds){
+    const spend=parseFloat(ad.spend||0);if(spend<=0)continue;
+    const key=(ad.adset_name||'').trim();if(!key)continue;
+    adsetSpend[key]=(adsetSpend[key]||0)+spend;
   }
-
-  if (parts.length < 3) return null;
-  if (!parts[0].includes('興趣')) return null;
-
-  let kolPartIdx = -1;
-  for (let i = 1; i < parts.length; i++) {
-    if (parts[i].toUpperCase().includes('KOL')) { kolPartIdx = i; break; }
-  }
-  if (kolPartIdx === -1) return null;
-
-  const audience = parts.slice(1, kolPartIdx).join(ci === 0 ? '｜' : ' - ').trim();
-  if (!audience) return null;
-
-  const kolRaw = parts[kolPartIdx].trim();
-  const kolName = kolRaw.replace(/^.*?KOL\s*/i, '').trim();
-  if (!kolName) return null;
-
-  return { audience, kolName };
-}
-
-function buildKolAudienceStats(rawAds, ci) {
-  const adsetSpend = {};
-  for (const ad of rawAds) {
-    const spend = parseFloat(ad.spend || 0);
-    if (spend <= 0) continue;
-    const key = (ad.adset_name || '').trim();
-    if (!key) continue;
-    adsetSpend[key] = (adsetSpend[key] || 0) + spend;
-  }
-  const kolMap = {};
-  for (const [adsetName, spend] of Object.entries(adsetSpend)) {
-    if (spend < 100) continue;
-    const parsed = parseKolAdset(adsetName, ci);
-    if (!parsed) continue;
-    const { audience, kolName } = parsed;
-    if (!kolMap[kolName]) kolMap[kolName] = { audiences: {}, totalSpend: 0, adsetSet: new Set() };
-    if (!kolMap[kolName].audiences[audience]) kolMap[kolName].audiences[audience] = 0;
-    kolMap[kolName].audiences[audience] += spend;
-    kolMap[kolName].totalSpend += spend;
+  const kolMap={},audMap={};
+  for(const[adsetName,spend] of Object.entries(adsetSpend)){
+    if(spend<100)continue;
+    const parsed=parseKolAdset(adsetName,ci);
+    if(!parsed)continue;
+    const{audience,kolName}=parsed;
+    if(!kolMap[kolName])kolMap[kolName]={audiences:{},totalSpend:0,adsetSet:new Set()};
+    kolMap[kolName].audiences[audience]=(kolMap[kolName].audiences[audience]||0)+spend;
+    kolMap[kolName].totalSpend+=spend;
     kolMap[kolName].adsetSet.add(adsetName);
+    audMap[audience]=(audMap[audience]||0)+spend;
   }
-  return kolMap;
+  return{kolMap,audMap};
 }
 
-function buildKolAudienceBlock(ci, rawAds) {
-  const kolMap = buildKolAudienceStats(rawAds, ci);
-  const kolNames = Object.keys(kolMap).sort();
+// ============================================================
+// 文字雲（單一容器）
+// ============================================================
+const WC_COLORS=['#7b1fa2','#1877f2','#e65100','#2e7d32','#c62828','#0277bd','#5c6bc0','#00838f','#ad1457','#558b2f','#4527a0','#d84315','#0288d1','#5d4037','#00695c','#f57c00','#1565c0','#880e4f','#1b5e20','#bf360c'];
 
-  if (kolNames.length === 0) {
-    return `<div class="kol-audience-body">
-      <div style="color:var(--text3);font-size:13px;padding:8px 0">近30天內無符合條件的KOL興趣測試組合（需花費 > NT$100）</div>
-    </div>`;
+function renderWordCloud(containerId, audMap){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML='';
+  const entries=Object.entries(audMap).sort((a,b)=>b[1]-a[1]).slice(0,60);
+  if(!entries.length){el.innerHTML='<div class="wc-empty-msg">無受眾資料</div>';return;}
+  const maxS=entries[0][1], minS=entries[entries.length-1][1];
+  const W=el.offsetWidth||600, H=el.offsetHeight||260;
+  if(W<50){
+    // 容器還沒 layout，稍後重試
+    setTimeout(()=>renderWordCloud(containerId,audMap),80);
+    return;
+  }
+  const placed=[], tt=document.getElementById('wc-tooltip');
+
+  function overlaps(x,y,w,h){
+    const p=3;
+    for(const r of placed){
+      if(x<r.x+r.w+p && x+w+p>r.x && y<r.y+r.h+p && y+h+p>r.y) return true;
+    }
+    return false;
   }
 
-  let body = '';
-  for (const kolName of kolNames) {
-    const data = kolMap[kolName];
-    const audienceList = Object.entries(data.audiences).sort((a,b) => b[1] - a[1]);
-    const uniqueAudienceCount = audienceList.length;
-    const kolTotalSpend = data.totalSpend;
-    const kolAdsetCount = data.adsetSet.size;
-    const chips = audienceList.map(([aud, spend]) =>
-      `<div class="kol-audience-chip">${aud}<span class="chip-spend">NT$${Math.round(spend).toLocaleString()}</span></div>`
-    ).join('');
-    body += `
+  // 螺旋從中心出發，角度偏移讓字散得更開
+  function tryPlace(tw,th){
+    for(let step=0;step<800;step++){
+      const a = step * 0.35;           // 角度
+      const r = 2.2 * Math.sqrt(step); // 半徑（平方根螺旋，擴散更均勻）
+      // 讓螺旋中心隨機偏移，避免全部擠在同一個中心
+      const jx = (Math.random()-0.5)*W*0.12;
+      const jy = (Math.random()-0.5)*H*0.12;
+      const cx = W/2 + jx + r*Math.cos(a);
+      const cy = H/2 + jy + r*Math.sin(a);
+      const x=Math.round(cx-tw/2), y=Math.round(cy-th/2);
+      if(x<2||y<2||x+tw>W-2||y+th>H-2) continue;
+      if(!overlaps(x,y,tw,th)) return{x,y};
+    }
+    return null;
+  }
+
+  entries.forEach(([word,spend],idx)=>{
+    const t=maxS===minS?1:(spend-minS)/(maxS-minS);
+    const fs=Math.round(12+t*32);
+    const span=document.createElement('span');
+    span.className='wc-word';
+    span.textContent=word;
+    span.style.cssText=`font-size:${fs}px;color:${WC_COLORS[idx%WC_COLORS.length]};opacity:${(0.72+t*0.28).toFixed(2)}`;
+    el.appendChild(span);
+    const tw=span.offsetWidth, th=span.offsetHeight;
+    const pos=tryPlace(tw,th);
+    if(!pos){span.remove();return;}
+    span.style.left=pos.x+'px';
+    span.style.top=pos.y+'px';
+    placed.push({x:pos.x,y:pos.y,w:tw,h:th});
+    span.addEventListener('mousemove',e=>{
+      tt.style.display='block';
+      tt.textContent=`${word}  NT$${Math.round(spend).toLocaleString()}`;
+      tt.style.left=(e.clientX+14)+'px';
+      tt.style.top=(e.clientY-32)+'px';
+    });
+    span.addEventListener('mouseleave',()=>{tt.style.display='none';});
+  });
+}
+
+// ============================================================
+// KOL 逐人區塊（每人各自文字雲 + 清單）
+// ============================================================
+const _kolCache={};
+
+function switchWcView(ci, kolSlug, view){
+  const wcEl   = document.getElementById(`wc-wrap-${ci}-${kolSlug}`);
+  const listEl = document.getElementById(`list-wrap-${ci}-${kolSlug}`);
+  if(wcEl)   wcEl.style.display   = view==='cloud'?'block':'none';
+  if(listEl) listEl.style.display = view==='list' ?'block':'none';
+  document.querySelectorAll(`.wc-tb-${ci}-${kolSlug}`).forEach(b=>{
+    b.classList.toggle('active', b.dataset.view===view);
+  });
+  if(view==='cloud'){
+    const data=_kolCache[ci];
+    if(data&&data.kolMap[decodeURIComponent(kolSlug)]){
+      const audMap=data.kolMap[decodeURIComponent(kolSlug)].audiences;
+      setTimeout(()=>renderWordCloud(`wc-${ci}-${kolSlug}`, audMap), 60);
+    }
+  }
+}
+
+// 全區切換（文字雲 vs 清單）
+function switchKolView(ci, view){
+  document.getElementById(`kol-wc-wrap-${ci}`).style.display = view==='cloud'?'block':'none';
+  document.getElementById(`kol-list-${ci}`).style.display    = view==='list' ?'block':'none';
+  document.querySelectorAll(`.wc-tb-${ci}`).forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  // 切回文字雲時重繪（可能容器剛顯示）
+  if(view==='cloud'){
+    const data=_kolCache[ci];
+    if(!data) return;
+    const names=Object.keys(data.kolMap).sort((a,b)=>data.kolMap[b].totalSpend-data.kolMap[a].totalSpend);
+    setTimeout(()=>{
+      for(const kolName of names){
+        renderWordCloud(`wc-${ci}-${slug(kolName)}`, data.kolMap[kolName].audiences);
+      }
+    }, 80);
+  }
+}
+
+function slug(name){ return encodeURIComponent((name||'').replace(/\s+/g,'-')); }
+
+function renderKolSection(ci){
+  const data=_kolCache[ci];
+  const wcWrap  = document.getElementById(`kol-wc-wrap-${ci}`);
+  const listWrap = document.getElementById(`kol-list-${ci}`);
+
+  if(!data||!Object.keys(data.kolMap).length){
+    const msg='<div style="color:var(--text3);font-size:13px;padding:8px 0">近30天內無符合條件的KOL興趣測試組合（花費 > NT$100）</div>';
+    if(wcWrap)   wcWrap.innerHTML=msg;
+    if(listWrap) listWrap.innerHTML=msg;
+    return;
+  }
+
+  const names=Object.keys(data.kolMap).sort((a,b)=>data.kolMap[b].totalSpend-data.kolMap[a].totalSpend);
+
+  // ── 文字雲視圖：每個 KOL 一個卡片含文字雲
+  let wcHtml='';
+  for(const kolName of names){
+    const d=data.kolMap[kolName];
+    const audList=Object.entries(d.audiences).sort((a,b)=>b[1]-a[1]);
+    const s=slug(kolName);
+    wcHtml+=`
       <div class="kol-person-block">
         <div class="kol-person-name">
           <span style="width:8px;height:8px;border-radius:50%;background:#6a1b9a;display:inline-block;flex-shrink:0"></span>
           <strong>${kolName}</strong>
-          <span class="kol-person-meta">不重複受眾 <b style="color:#4a148c">${uniqueAudienceCount}</b> 組｜廣告組合 <b style="color:#4a148c">${kolAdsetCount}</b> 組｜花費 <b style="color:#4a148c">NT$${Math.round(kolTotalSpend).toLocaleString()}</b></span>
+          <span class="kol-person-meta">不重複受眾 <b style="color:#4a148c">${audList.length}</b> 組｜廣告組合 <b style="color:#4a148c">${d.adsetSet.size}</b> 組｜花費 <b style="color:#4a148c">NT$${Math.round(d.totalSpend).toLocaleString()}</b></span>
         </div>
-        <div class="kol-audience-chips">${chips}</div>
+        <div class="wordcloud-wrap" id="wc-${ci}-${s}" style="height:280px;margin-bottom:6px">
+          <div class="wc-empty-msg" style="padding:40px">載入中...</div>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:8px">字體大小依花費比例縮放｜hover 可看花費金額</div>
       </div>`;
   }
-  return `<div class="kol-audience-body">${body}</div>`;
+  if(wcWrap) wcWrap.innerHTML = wcHtml;
+
+  // ── 清單視圖：每個 KOL 清單
+  let listHtml='';
+  for(const kolName of names){
+    const d=data.kolMap[kolName];
+    const audList=Object.entries(d.audiences).sort((a,b)=>b[1]-a[1]);
+    const chips=audList.map(([aud,sp])=>`<div class="kol-chip">${aud}<span class="kol-chip-spend">NT$${Math.round(sp).toLocaleString()}</span></div>`).join('');
+    listHtml+=`
+      <div class="kol-person-block">
+        <div class="kol-person-name">
+          <span style="width:8px;height:8px;border-radius:50%;background:#6a1b9a;display:inline-block;flex-shrink:0"></span>
+          <strong>${kolName}</strong>
+          <span class="kol-person-meta">不重複受眾 <b style="color:#4a148c">${audList.length}</b> 組｜廣告組合 <b style="color:#4a148c">${d.adsetSet.size}</b> 組｜花費 <b style="color:#4a148c">NT$${Math.round(d.totalSpend).toLocaleString()}</b></span>
+        </div>
+        <div class="kol-chips">${chips}</div>
+      </div>`;
+  }
+  if(listWrap) listWrap.innerHTML = listHtml;
+
+  // 等容器真的有寬度才渲染
+  function drawAllClouds(attempt){
+    if(attempt > 30) return;
+    const firstEl = document.getElementById(`wc-${ci}-${slug(names[0])}`);
+    if(!firstEl || firstEl.offsetWidth < 100){
+      setTimeout(()=>drawAllClouds(attempt+1), 50);
+      return;
+    }
+    for(const kolName of names){
+      renderWordCloud(`wc-${ci}-${slug(kolName)}`, data.kolMap[kolName].audiences);
+    }
+  }
+  setTimeout(()=>drawAllClouds(0), 100);
 }
 
-function buildKolSummaryBlock(ci, rawAds) {
-  const kolAds = rawAds.filter(ad => {
-    if (parseFloat(ad.spend || 0) <= 0) return false;
-    const type = classType(ad.campaign_name, ci);
-    return isKolType(type, ad.ad_name);
-  });
-
-  if (kolAds.length === 0) {
-    return `<div class="kol-summary-body"><div style="color:var(--text3);font-size:13px">昨天無KOL廣告花費</div></div>`;
-  }
-
-  const merged = mergeAdsByName(kolAds, ci);
-  let totalSpend = 0, totalPurchase = 0, totalAcv = 0, totalCart = 0, totalImpressions = 0, totalClicks = 0;
-  for (const ad of merged) {
-    totalSpend += parseFloat(ad.spend || 0);
-    totalPurchase += adv(ad, 'purchase');
-    totalAcv += adacv(ad, 'purchase');
-    totalCart += adv(ad, 'add_to_cart');
-    totalImpressions += parseInt(ad.impressions || 0);
-    totalClicks += parseInt(ad.clicks || 0);
-  }
-  const totalCpa = totalPurchase > 0 ? totalSpend / totalPurchase : 0;
-  const totalRoas = totalSpend > 0 ? totalAcv / totalSpend : 0;
-  const totalCtr = totalImpressions > 0 ? totalClicks / totalImpressions * 100 : 0;
-
-  const fM = n => n > 0 ? 'NT$' + Math.round(n).toLocaleString() : '-';
-  const fX = n => n > 0 ? n.toFixed(2) + 'x' : '-';
-  const rc = r => r >= 3 ? 'var(--green)' : r >= 2 ? 'var(--amber)' : r > 0 ? 'var(--red)' : '#4a148c';
-  const cpaCl = (cpa) => { const t = CLIENTS[ci].cpa; return cpa <= 0 ? '#4a148c' : cpa < t.good ? 'var(--green)' : cpa < t.ok ? 'var(--amber)' : 'var(--red)'; };
-
-  const sortedAds = [...merged].sort((a, b) => parseFloat(b.spend || 0) - parseFloat(a.spend || 0));
-  const rows = sortedAds.map(ad => {
-    const sp = parseFloat(ad.spend || 0);
-    const pur = adv(ad, 'purchase');
-    const cpa = adcpa(ad, 'purchase');
-    const roas = sp > 0 ? adacv(ad, 'purchase') / sp : 0;
-    const dispName = (ad.ad_name || '').length > 35 ? (ad.ad_name || '').slice(0, 35) + '…' : (ad.ad_name || '未命名');
-    return `<tr>
-      <td style="padding:7px 12px"><div style="font-size:12px;font-weight:500;color:var(--text)">${dispName}</div></td>
-      <td style="padding:7px 12px;text-align:right">NT$${Math.round(sp).toLocaleString()}</td>
-      <td style="padding:7px 12px;text-align:right">${pur > 0 ? pur : '-'}</td>
-      <td style="padding:7px 12px;text-align:right;font-weight:700"><span style="color:${cpaCl(cpa)}">${fM(cpa)}</span></td>
-      <td style="padding:7px 12px;text-align:right;font-weight:600"><span style="color:${rc(roas)}">${fX(roas)}</span></td>
-    </tr>`;
-  }).join('');
-
-  return `
-    <div class="kol-summary-body">
-      <div class="kol-summary-grid">
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">KOL 總花費</div><div class="kol-summary-kpi-value" style="font-size:15px">NT$${Math.round(totalSpend).toLocaleString()}</div></div>
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">購買單數</div><div class="kol-summary-kpi-value">${totalPurchase > 0 ? totalPurchase : '-'}</div></div>
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">CPA</div><div class="kol-summary-kpi-value" style="font-size:15px;color:${cpaCl(totalCpa)}">${fM(totalCpa)}</div></div>
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">ROAS</div><div class="kol-summary-kpi-value" style="color:${rc(totalRoas)}">${fX(totalRoas)}</div></div>
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">加購次數</div><div class="kol-summary-kpi-value">${totalCart > 0 ? totalCart : '-'}</div></div>
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">CTR</div><div class="kol-summary-kpi-value">${totalCtr > 0 ? totalCtr.toFixed(2) + '%' : '-'}</div></div>
-        <div class="kol-summary-kpi"><div class="kol-summary-kpi-label">素材數（去重）</div><div class="kol-summary-kpi-value">${merged.length}</div></div>
-      </div>
-      <div style="margin-top:14px">
-        <table class="kol-summary-table">
-          <thead><tr>
-            <th>KOL 素材名稱</th>
-            <th style="text-align:right">花費</th>
-            <th style="text-align:right">購買</th>
-            <th style="text-align:right">CPA</th>
-            <th style="text-align:right">ROAS</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>`;
-}
-
-function recommendAd(ad, ci) {
-  const spend=parseFloat(ad.spend||0), cpa=adcpa(ad,'purchase'), roas=spend>0?adacv(ad,'purchase')/spend:0;
-  const purchase=adv(ad,'purchase'), cart=adv(ad,'add_to_cart');
-  const thr=CLIENTS[ci].cpa;
-
-  if(spend<300) return {badge:'rec-watch',label:'觀察中',reason:`花費 NT$${Math.round(spend)}，資料不足`};
-
-  if(purchase===0){
-    if(spend>=1000&&cart===0) return {badge:'rec-kill',label:'立即暫停',reason:`花費 NT$${Math.round(spend)} 零購買零加購`};
-    if(cart>0) return {badge:'rec-recut',label:'優化落地頁',reason:`有 ${cart} 次加購但零購買，建議優化結帳流程`};
-    return {badge:'rec-watch',label:'觀察中',reason:`花費 NT$${Math.round(spend)} 尚無購買，繼續觀察`};
-  }
-
-  if(cpa<thr.good){
-    if(purchase>=10||roas>=4) return {badge:'rec-boost',label:'加大預算',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆 ROAS ${roas.toFixed(2)}x，明星素材建議加 20-30% 預算`};
-    if(purchase>=5)           return {badge:'rec-boost',label:'加大預算',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆，建議加大預算放量`};
-    return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（優秀✅）購買 ${purchase} 筆，維持現有預算`};
-  }
-  if(cpa<thr.ok){
-    if(purchase>=8&&roas>=3) return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（普通）購買 ${purchase} 筆 ROAS ${roas.toFixed(2)}x，整體表現不錯`};
-    if(roas>=3)              return {badge:'rec-keep',label:'持續投放',reason:`CPA NT$${Math.round(cpa)}（普通）ROAS ${roas.toFixed(2)}x 達標，維持預算觀察`};
-    return {badge:'rec-watch',label:'持續觀察',reason:`CPA NT$${Math.round(cpa)}（普通）購買 ${purchase} 筆，建議再觀察 2-3 天`};
-  }
-  if(purchase>=15&&roas>=3) return {badge:'rec-watch',label:'持續觀察',reason:`CPA NT$${Math.round(cpa)}（偏高）但購買量大（${purchase}筆）且 ROAS ${roas.toFixed(2)}x，縮預算繼續觀察`};
-  if(roas<1.5)              return {badge:'rec-kill',label:'重新剪輯',reason:`CPA NT$${Math.round(cpa)}（差⚠️）ROAS ${roas.toFixed(2)}x 低於盈虧點，建議重新製作素材`};
-  return {badge:'rec-recut',label:'調整素材',reason:`CPA NT$${Math.round(cpa)}（差⚠️）購買 ${purchase} 筆，建議調整素材訴求`};
-}
-
-async function fetchInsights(accountId, s, e) {
+// ============================================================
+// API
+// ============================================================
+async function fetchInsights(accountId,s,e){
   const url=`https://graph.facebook.com/v19.0/act_${accountId}/insights?fields=${FIELDS}&time_range={"since":"${s}","until":"${e}"}&level=account&access_token=${TOKEN}`;
-  const res=await fetch(url); const data=await res.json();
-  if(data.error) throw new Error(data.error.message);
+  const res=await fetch(url);const data=await res.json();
+  if(data.error)throw new Error(data.error.message);
   return data.data?.length>0?data.data[0]:null;
 }
-async function fetchAdInsights(accountId, s, e) {
-  const end=e||s; let all=[];
+async function fetchAdInsights(accountId,s,e){
+  const end=e||s;let all=[],pg=0;
   let url=`https://graph.facebook.com/v19.0/act_${accountId}/insights?fields=${AD_FIELDS}&time_range={"since":"${s}","until":"${end}"}&level=ad&limit=200&access_token=${TOKEN}`;
-  let pg=0;
-  while(url&&pg<20){
-    const res=await fetch(url); const data=await res.json();
-    if(data.error) throw new Error(data.error.message+'(code:'+data.error.code+')');
-    if(data.data) all=all.concat(data.data);
-    url=data.paging?.next||null; pg++;
-  }
+  while(url&&pg<20){const res=await fetch(url);const data=await res.json();if(data.error)throw new Error(data.error.message);if(data.data)all=all.concat(data.data);url=data.paging?.next||null;pg++;}
   return all;
 }
 
-async function fetchClientData(ci) {
-  const client=CLIENTS[ci]; const{today,yesterday}=getDateRange();
-  const now=new Date(); const m1=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+async function fetchClientData(ci){
+  const client=CLIENTS[ci];const{today,yesterday}=getDateRange();
+  const now=new Date();const m1=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
   const res={today:[],yesterday:[],adsToday:[],adsYesterday:[],monthTotal:[],adsPrev:[],ads30d:[]};
   const r15a=getExtendedDateRange(15);
-  const r15b={since:getExtendedDateRange(30).since, until:getExtendedDateRange(16).since};
-
-  const mergedActiveAdsetNames = new Set();
-  for (const acc of client.accounts) {
-    const names = await fetchActiveAdsetMap(acc).catch(() => new Set());
-    for (const n of names) mergedActiveAdsetNames.add(n);
-  }
-
+  const r15b={since:getExtendedDateRange(30).since,until:getExtendedDateRange(16).since};
+  const mergedActive=new Set();
+  for(const acc of client.accounts){const n=await fetchActiveAdsetMap(acc).catch(()=>new Set());for(const x of n)mergedActive.add(x);}
   for(const acc of client.accounts){
     const[t,y,at,ay,mo,ap,a30a,a30b]=await Promise.all([
       fetchInsights(acc,today,today).catch(()=>null),
@@ -577,462 +543,208 @@ async function fetchClientData(ci) {
       fetchAdInsights(acc,yesterday).catch(()=>[]),
       fetchInsights(acc,m1,today).catch(()=>null),
       fetchAdInsights(acc,yesterday).catch(()=>[]),
-      fetchAdInsights(acc,r15a.since,r15a.until).catch(e=>{console.warn('ads30d[0] err',e.message);return[];}),
-      fetchAdInsights(acc,r15b.since,r15b.until).catch(e=>{console.warn('ads30d[1] err',e.message);return[];})
+      fetchAdInsights(acc,r15a.since,r15a.until).catch(()=>[]),
+      fetchAdInsights(acc,r15b.since,r15b.until).catch(()=>[])
     ]);
-    if(t)res.today.push(t); if(y)res.yesterday.push(y); if(mo)res.monthTotal.push(mo);
+    if(t)res.today.push(t);if(y)res.yesterday.push(y);if(mo)res.monthTotal.push(mo);
     res.adsToday=res.adsToday.concat(at||[]);
     res.adsYesterday=res.adsYesterday.concat(ay||[]);
     res.adsPrev=res.adsPrev.concat(ap||[]);
     res.ads30d=res.ads30d.concat(a30a||[]).concat(a30b||[]);
   }
-  const uniqAdsets=(ads)=>new Set(
-    ads.filter(a=>{
-      if(parseFloat(a.spend||0)<=0) return false;
-      const camp=(a.campaign_name||'').toUpperCase();
-      if(camp.includes('ASC')) return false;
-      if(camp.includes('RT')) return false;
-      return true;
-    }).map(a=>(a.adset_name||'').trim())
-    .filter(n=>n.length>0)
-  ).size;
-  return{
-    today:mergeInsights(res.today), yesterday:mergeInsights(res.yesterday),
-    adsToday:res.adsToday, adsYesterday:res.adsYesterday,
-    monthTotal:mergeInsights(res.monthTotal),
-    adsetCountToday:uniqAdsets(res.adsToday),
-    adsetCountYesterday:uniqAdsets(res.adsPrev),
-    ads30d:res.ads30d,
-    activeAdsetNames: mergedActiveAdsetNames
-  };
+  const uniqAdsets=(ads)=>new Set(ads.filter(a=>{if(parseFloat(a.spend||0)<=0)return false;const c=(a.campaign_name||'').toUpperCase();if(c.includes('ASC')||c.includes('RT'))return false;return true;}).map(a=>(a.adset_name||'').trim()).filter(n=>n.length>0)).size;
+  return{today:mergeInsights(res.today),yesterday:mergeInsights(res.yesterday),adsToday:res.adsToday,adsYesterday:res.adsYesterday,monthTotal:mergeInsights(res.monthTotal),adsetCountToday:uniqAdsets(res.adsToday),adsetCountYesterday:uniqAdsets(res.adsPrev),ads30d:res.ads30d,activeAdsetNames:mergedActive};
 }
 
-function fmt(n,type='num'){
-  if(n===null||n===undefined||isNaN(n))return'-';
-  if(type==='money')return'NT$'+Math.round(n).toLocaleString();
-  if(type==='pct')return n.toFixed(2)+'%';
-  if(type==='x')return n.toFixed(2)+'x';
-  return Math.round(n).toLocaleString();
-}
-function chgBadge(a,b,lb=false){
-  if(!b||b===0)return'';
-  const p=(a-b)/b*100,good=lb?p<0:p>0;
-  const cls=Math.abs(p)<1?'neu':good?'up':'down';
-  return`<span class="change-badge ${cls}">${p>0?'+':''}${p.toFixed(1)}%</span>`;
-}
+// ============================================================
+// 格式化
+// ============================================================
+function fmt(n,type='num'){if(n===null||n===undefined||isNaN(n))return'-';if(type==='money')return'NT$'+Math.round(n).toLocaleString();if(type==='pct')return n.toFixed(2)+'%';if(type==='x')return n.toFixed(2)+'x';return Math.round(n).toLocaleString();}
+function chgBadge(a,b,lb=false){if(!b||b===0)return'';const p=(a-b)/b*100,good=lb?p<0:p>0;const cls=Math.abs(p)<1?'neu':good?'up':'down';return`<span class="change-badge ${cls}">${p>0?'+':''}${p.toFixed(1)}%</span>`;}
 function row2(top,bot){return`${top}<br><small style="color:var(--text3)">${bot}</small>`;}
 const rc=(r)=>r>=3?'var(--green)':r>=2?'var(--amber)':r>0?'var(--red)':'var(--text3)';
 const fM=(n)=>n>0?'NT$'+Math.round(n).toLocaleString():'-';
 const fX=(n)=>n>0?n.toFixed(2)+'x':'-';
 const fP=(n)=>n>0?n.toFixed(1)+'%':'-';
-const cpaCl=(cpa,ci)=>{ const t=CLIENTS[ci].cpa; return cpa<=0?'var(--text3)':cpa<t.good?'var(--green)':cpa<t.ok?'var(--amber)':'var(--red)'; };
+const cpaCl=(cpa,ci)=>{const t=CLIENTS[ci].cpa;return cpa<=0?'var(--text3)':cpa<t.good?'var(--green)':cpa<t.ok?'var(--amber)':'var(--red)';};
 
-function mergeAdsByName(rawAds, ci) {
+function mergeAdsByName(rawAds,ci){
   const map={};
   for(const ad of rawAds){
-    if(parseFloat(ad.spend||0)<=0) continue;
-    const type=classType(ad.campaign_name,ci);
-    if(type==='__SKIP__') continue;
+    if(parseFloat(ad.spend||0)<=0)continue;
+    const type=classType(ad.campaign_name,ci);if(type==='__SKIP__')continue;
     const key=normName(ad.ad_name);
-    if(!map[key]){
-      map[key]=JSON.parse(JSON.stringify(ad));
-      map[key].ad_name=key; map[key]._campaign=ad.campaign_name; map[key]._type=type;
-    } else {
+    if(!map[key]){map[key]=JSON.parse(JSON.stringify(ad));map[key].ad_name=key;map[key]._campaign=ad.campaign_name;map[key]._type=type;}
+    else{
       const base=map[key];
       base.spend=String(parseFloat(base.spend||0)+parseFloat(ad.spend||0));
       base.impressions=String(parseInt(base.impressions||0)+parseInt(ad.impressions||0));
       base.clicks=String(parseInt(base.clicks||0)+parseInt(ad.clicks||0));
-      const mArr=(f)=>{
-        if(!ad[f])return; if(!base[f]){base[f]=JSON.parse(JSON.stringify(ad[f]));return;}
-        for(const item of ad[f]){const ex=base[f].find(x=>x.action_type===item.action_type);if(ex)ex.value=String(parseFloat(ex.value||0)+parseFloat(item.value||0));else base[f].push(JSON.parse(JSON.stringify(item)));}
-      };
-      mArr('actions');mArr('action_values');mArr('outbound_clicks');
-      mArr('video_play_actions');mArr('video_p25_watched_actions');mArr('video_p95_watched_actions');
+      const mArr=(f)=>{if(!ad[f])return;if(!base[f]){base[f]=JSON.parse(JSON.stringify(ad[f]));return;}for(const item of ad[f]){const ex=base[f].find(x=>x.action_type===item.action_type);if(ex)ex.value=String(parseFloat(ex.value||0)+parseFloat(item.value||0));else base[f].push(JSON.parse(JSON.stringify(item)));}};
+      mArr('actions');mArr('action_values');mArr('outbound_clicks');mArr('video_play_actions');mArr('video_p25_watched_actions');mArr('video_p95_watched_actions');
       const imp=parseInt(base.impressions||0),clk=parseInt(base.clicks||0);
       base.ctr=imp>0?String((clk/imp*100).toFixed(4)):'0';
-      const sp=parseFloat(base.spend||0); base.cost_per_action_type=[];
+      const sp=parseFloat(base.spend||0);base.cost_per_action_type=[];
       if(base.actions)for(const a of base.actions){const v=parseFloat(a.value||0);if(v>0&&sp>0)base.cost_per_action_type.push({action_type:a.action_type,value:String((sp/v).toFixed(2))});}
     }
   }
   return Object.values(map);
 }
 
-function sumType(rawAds, type, ci){
+function sumType(rawAds,type,ci){
   let s=0,p=0,a=0,c=0;
-  for(const ad of rawAds){
-    if(parseFloat(ad.spend||0)<=0)continue;
-    if(classType(ad.campaign_name,ci)!==type)continue;
-    s+=parseFloat(ad.spend||0); p+=adv(ad,'purchase'); a+=adacv(ad,'purchase'); c+=adv(ad,'add_to_cart');
-  }
+  for(const ad of rawAds){if(parseFloat(ad.spend||0)<=0)continue;if(classType(ad.campaign_name,ci)!==type)continue;s+=parseFloat(ad.spend||0);p+=adv(ad,'purchase');a+=adacv(ad,'purchase');c+=adv(ad,'add_to_cart');}
   return{spend:s,purchase:p,acv:a,cart:c,cpa:p>0?s/p:0,roas:s>0?a/s:0};
 }
 
-// ── MODIFIED: buildDailyReport — removed 月目標 and AI 口述報告 sections ──
-function buildDailyReport(ci, todayData, adsToday, extra = {}) {
-  const client = CLIENTS[ci];
-  const thr = client.cpa;
-  const spend = parseFloat(todayData?.spend || 0);
-
-  if (!spend) return '<div class="report-loading">⏳ 昨天尚無花費數據</div>';
-
-  const purchase = gv(todayData, 'purchase');
-  const cpa = gcpa(todayData, 'purchase');
-  const acv = gacv(todayData, 'purchase');
-  const roas = spend > 0 ? acv / spend : 0;
-  const ctr = parseFloat(todayData?.ctr || 0);
-  const convRate = todayData?.clicks > 0 ? purchase / todayData.clicks * 100 : 0;
-
-  const mo = extra.monthTotal || null;
-  const moPurchase = mo ? Math.round(gv(mo, 'purchase')) : 0;
-
-  const cpaCl_local = (c) => { const t=thr; return c<=0?'var(--text3)':c<t.good?'var(--green)':c<t.ok?'var(--amber)':'var(--red)'; };
-  const rc_local = r => r>=3?'var(--green)':r>=2?'var(--amber)':r>0?'var(--red)':'var(--text3)';
-
-  return `
-    <div class="report-section">
-      <div class="report-section-title">📊 昨日關鍵數字</div>
-      <div class="kpi-chips">
-        <div class="kpi-chip"><div class="kpi-chip-label">購買單數</div><div class="kpi-chip-value">${purchase}</div></div>
-        <div class="kpi-chip"><div class="kpi-chip-label">廣告費</div><div class="kpi-chip-value" style="font-size:14px">NT$${Math.round(spend).toLocaleString()}</div></div>
-        ${acv > 0 ? `<div class="kpi-chip"><div class="kpi-chip-label">營業額</div><div class="kpi-chip-value" style="font-size:13px">NT$${Math.round(acv).toLocaleString()}</div></div>` : ''}
-        <div class="kpi-chip"><div class="kpi-chip-label">CPA ★</div><div class="kpi-chip-value" style="font-size:14px;color:${cpaCl_local(cpa)}">NT$${Math.round(cpa)}</div></div>
-        <div class="kpi-chip"><div class="kpi-chip-label">ROAS</div><div class="kpi-chip-value" style="color:${rc_local(roas)}">${roas.toFixed(2)}x</div></div>
-        <div class="kpi-chip"><div class="kpi-chip-label">轉換率</div><div class="kpi-chip-value">${convRate.toFixed(2)}%</div></div>
-        <div class="kpi-chip"><div class="kpi-chip-label">CTR</div><div class="kpi-chip-value">${ctr.toFixed(2)}%</div></div>
-        ${moPurchase > 0 ? `<div class="kpi-chip"><div class="kpi-chip-label">月累計</div><div class="kpi-chip-value">${moPurchase} 單</div></div>` : ''}
-      </div>
-    </div>`;
+function recommendAd(ad,ci){
+  const spend=parseFloat(ad.spend||0),cpa=adcpa(ad,'purchase'),roas=spend>0?adacv(ad,'purchase')/spend:0;
+  const purchase=adv(ad,'purchase'),cart=adv(ad,'add_to_cart');
+  const thr=CLIENTS[ci].cpa;
+  if(spend<200)return{badge:'rec-watch',label:'觀察中'};
+  if(purchase===0){if(spend>=600&&cart===0)return{badge:'rec-kill',label:'立即暫停'};if(cart>0)return{badge:'rec-recut',label:'優化落地頁'};return{badge:'rec-watch',label:'觀察中'};}
+  if(cpa<thr.good){if(purchase>=10||roas>=4)return{badge:'rec-boost',label:'加大預算'};if(purchase>=5)return{badge:'rec-boost',label:'加大預算'};return{badge:'rec-keep',label:'持續投放'};}
+  if(cpa<thr.ok){if(purchase>=8&&roas>=3)return{badge:'rec-keep',label:'持續投放'};if(roas>=3)return{badge:'rec-keep',label:'持續投放'};return{badge:'rec-watch',label:'持續觀察'};}
+  if(purchase>=15&&roas>=3)return{badge:'rec-watch',label:'持續觀察'};
+  if(roas<1.5)return{badge:'rec-kill',label:'重新剪輯'};
+  return{badge:'rec-recut',label:'調整素材'};
 }
 
-const _reportCache = {};
-
-function refreshReport(ci) {
-  const c = _reportCache[ci]; if (!c) return;
-  document.getElementById('daily-report-' + ci).innerHTML = buildDailyReport(ci, c.todayData, c.adsToday, c.extra);
+function buildDailyReport(ci,todayData,adsToday,extra={}){
+  const thr=CLIENTS[ci].cpa;const spend=parseFloat(todayData?.spend||0);
+  if(!spend)return'<div class="report-loading">⏳ 昨天尚無花費數據</div>';
+  const purchase=gv(todayData,'purchase'),cpa=gcpa(todayData,'purchase'),acv=gacv(todayData,'purchase');
+  const roas=spend>0?acv/spend:0,ctr=parseFloat(todayData?.ctr||0);
+  const convRate=todayData?.clicks>0?purchase/todayData.clicks*100:0;
+  const mo=extra.monthTotal||null,moPurchase=mo?Math.round(gv(mo,'purchase')):0;
+  const cpaCl_=(c)=>{const t=thr;return c<=0?'var(--text3)':c<t.good?'var(--green)':c<t.ok?'var(--amber)':'var(--red)';};
+  const rc_=r=>r>=3?'var(--green)':r>=2?'var(--amber)':r>0?'var(--red)':'var(--text3)';
+  return`<div class="report-section"><div class="report-section-title">📊 昨日關鍵數字</div><div class="kpi-chips">
+    <div class="kpi-chip"><div class="kpi-chip-label">購買單數</div><div class="kpi-chip-value">${purchase}</div></div>
+    <div class="kpi-chip"><div class="kpi-chip-label">廣告費</div><div class="kpi-chip-value" style="font-size:14px">NT$${Math.round(spend).toLocaleString()}</div></div>
+    ${acv>0?`<div class="kpi-chip"><div class="kpi-chip-label">營業額</div><div class="kpi-chip-value" style="font-size:13px">NT$${Math.round(acv).toLocaleString()}</div></div>`:''}
+    <div class="kpi-chip"><div class="kpi-chip-label">CPA ★</div><div class="kpi-chip-value" style="font-size:14px;color:${cpaCl_(cpa)}">NT$${Math.round(cpa)}</div></div>
+    <div class="kpi-chip"><div class="kpi-chip-label">ROAS</div><div class="kpi-chip-value" style="color:${rc_(roas)}">${roas.toFixed(2)}x</div></div>
+    <div class="kpi-chip"><div class="kpi-chip-label">轉換率</div><div class="kpi-chip-value">${convRate.toFixed(2)}%</div></div>
+    <div class="kpi-chip"><div class="kpi-chip-label">CTR</div><div class="kpi-chip-value">${ctr.toFixed(2)}%</div></div>
+    ${moPurchase>0?`<div class="kpi-chip"><div class="kpi-chip-label">月累計</div><div class="kpi-chip-value">${moPurchase} 單</div></div>`:''}
+  </div></div>`;
 }
 
-function buildCreativeSummary(ci, adsToday, adsYesterday) {
-  const { today: d1, yesterday: d2 } = getDateRange();
-  const typeOrder = ['流量/互動/觀看', 'ASC', 'KOL', '興趣', '類似', 'RT', '其他'];
-  const typeColor = { 'ASC':'#1565c0','KOL':'#6a1b9a','興趣':'#e65100','類似':'#2e7d32','RT':'#c62828','流量/互動/觀看':'#37474f','其他':'#546e7a' };
+const _reportCache={};
 
-  let grandT = { spend: 0, purchase: 0, acv: 0 }, grandY = { spend: 0, purchase: 0, acv: 0 };
-  const allTypes = typeOrder.filter(t => {
-    const st = sumType(adsToday, t, ci), sy = sumType(adsYesterday, t, ci);
-    if (st.spend > 0) { grandT.spend += st.spend; grandT.purchase += st.purchase; grandT.acv += st.acv; }
-    if (sy.spend > 0) { grandY.spend += sy.spend; grandY.purchase += sy.purchase; grandY.acv += sy.acv; }
-    return st.spend > 0 || sy.spend > 0;
-  });
-
-  let rows = '';
-  for (const typeName of allTypes) {
-    const st = sumType(adsToday, typeName, ci), sy = sumType(adsYesterday, typeName, ci);
-    const color = typeColor[typeName] || '#546e7a';
-    const pctT = grandT.spend > 0 ? st.spend / grandT.spend * 100 : 0;
-    const pctY = grandY.spend > 0 ? sy.spend / grandY.spend * 100 : 0;
-    rows += `<tr>
-      <td style="padding:9px 14px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span><b>${typeName}</b></td>
-      <td style="padding:9px 14px;text-align:right">${fM(st.spend)}<br><small style="color:var(--text3)">${fM(sy.spend)}</small><br>${chgBadge(st.spend, sy.spend, false)}</td>
-      <td style="padding:9px 14px;text-align:right">${row2(fP(pctT), fP(pctY))}</td>
-      <td style="padding:9px 14px;text-align:right">${row2(st.purchase > 0 ? st.purchase : '-', sy.purchase > 0 ? sy.purchase : '-')}</td>
-      <td style="padding:9px 14px;text-align:right"><span style="color:${cpaCl(st.cpa, ci)};font-weight:700">${fM(st.cpa)}</span><br><small style="color:var(--text3)">${fM(sy.cpa)}</small><br>${chgBadge(st.cpa, sy.cpa, true)}</td>
-      <td style="padding:9px 14px;text-align:right;font-weight:600"><span style="color:${rc(st.roas)}">${fX(st.roas)}</span><br><small style="color:${rc(sy.roas)}">${fX(sy.roas)}</small></td>
-    </tr>`;
+function buildCreativeSummary(ci,adsToday,adsYesterday){
+  const{today:d1,yesterday:d2}=getDateRange();
+  const typeOrder=['流量/互動/觀看','ASC','KOL','興趣','類似','RT','其他'];
+  const typeColor={'ASC':'#1565c0','KOL':'#6a1b9a','興趣':'#e65100','類似':'#2e7d32','RT':'#c62828','流量/互動/觀看':'#37474f','其他':'#546e7a'};
+  let grandT={spend:0,purchase:0,acv:0},grandY={spend:0,purchase:0,acv:0};
+  const allTypes=typeOrder.filter(t=>{const st=sumType(adsToday,t,ci),sy=sumType(adsYesterday,t,ci);if(st.spend>0){grandT.spend+=st.spend;grandT.purchase+=st.purchase;grandT.acv+=st.acv;}if(sy.spend>0){grandY.spend+=sy.spend;grandY.purchase+=sy.purchase;grandY.acv+=sy.acv;}return st.spend>0||sy.spend>0;});
+  let rows='';
+  for(const typeName of allTypes){
+    const st=sumType(adsToday,typeName,ci),sy=sumType(adsYesterday,typeName,ci);
+    const color=typeColor[typeName]||'#546e7a';
+    const pctT=grandT.spend>0?st.spend/grandT.spend*100:0,pctY=grandY.spend>0?sy.spend/grandY.spend*100:0;
+    rows+=`<tr><td style="padding:9px 14px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px"></span><b>${typeName}</b></td><td style="padding:9px 14px;text-align:right">${fM(st.spend)}<br><small style="color:var(--text3)">${fM(sy.spend)}</small><br>${chgBadge(st.spend,sy.spend,false)}</td><td style="padding:9px 14px;text-align:right">${row2(fP(pctT),fP(pctY))}</td><td style="padding:9px 14px;text-align:right">${row2(st.purchase>0?st.purchase:'-',sy.purchase>0?sy.purchase:'-')}</td><td style="padding:9px 14px;text-align:right"><span style="color:${cpaCl(st.cpa,ci)};font-weight:700">${fM(st.cpa)}</span><br><small style="color:var(--text3)">${fM(sy.cpa)}</small><br>${chgBadge(st.cpa,sy.cpa,true)}</td><td style="padding:9px 14px;text-align:right;font-weight:600"><span style="color:${rc(st.roas)}">${fX(st.roas)}</span><br><small style="color:${rc(sy.roas)}">${fX(sy.roas)}</small></td></tr>`;
   }
-
-  const gTR = grandT.spend > 0 ? grandT.acv / grandT.spend : 0, gYR = grandY.spend > 0 ? grandY.acv / grandY.spend : 0;
-  const gTC = grandT.purchase > 0 ? grandT.spend / grandT.purchase : 0, gYC = grandY.purchase > 0 ? grandY.spend / grandY.purchase : 0;
-
-  return `<div style="font-size:11px;color:var(--text3);margin-bottom:6px">上排 = 昨天（${d1}）｜下排灰色 = 前天（${d2}）</div>
-    <div class="metrics-table" style="margin-bottom:16px">
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
-        <thead><tr style="background:var(--surface2)">
-          <th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)">類型</th>
-          <th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">花費</th>
-          <th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">佔比</th>
-          <th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">購買</th>
-          <th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">CPA ★</th>
-          <th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">ROAS</th>
-        </tr></thead>
-        <tbody style="background:var(--surface)">
-          ${rows}
-          <tr style="background:var(--surface2);font-weight:600;border-top:1.5px solid var(--border2)">
-            <td style="padding:10px 14px">總計</td>
-            <td style="padding:10px 14px;text-align:right">${fM(grandT.spend)}<br><small style="color:var(--text3)">${fM(grandY.spend)}</small><br>${chgBadge(grandT.spend, grandY.spend)}</td>
-            <td style="padding:10px 14px;text-align:right">100%</td>
-            <td style="padding:10px 14px;text-align:right">${grandT.purchase > 0 ? grandT.purchase : '-'}<br><small style="color:var(--text3)">${grandY.purchase > 0 ? grandY.purchase : '-'}</small></td>
-            <td style="padding:10px 14px;text-align:right"><span style="color:${cpaCl(gTC, ci)};font-weight:700">${fM(gTC)}</span><br><small style="color:var(--text3)">${fM(gYC)}</small><br>${chgBadge(gTC, gYC, true)}</td>
-            <td style="padding:10px 14px;text-align:right;font-weight:600"><span style="color:${rc(gTR)}">${fX(gTR)}</span><br><small style="color:${rc(gYR)}">${fX(gYR)}</small></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>`;
+  const gTR=grandT.spend>0?grandT.acv/grandT.spend:0,gYR=grandY.spend>0?grandY.acv/grandY.spend:0;
+  const gTC=grandT.purchase>0?grandT.spend/grandT.purchase:0,gYC=grandY.purchase>0?grandY.spend/grandY.purchase:0;
+  return`<div style="font-size:11px;color:var(--text3);margin-bottom:6px">上排 = 昨天（${d1}）｜下排灰色 = 前天（${d2}）</div><div class="metrics-table" style="margin-bottom:16px"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:var(--surface2)"><th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)">類型</th><th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">花費</th><th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">佔比</th><th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">購買</th><th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">CPA ★</th><th style="padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);text-align:right">ROAS</th></tr></thead><tbody style="background:var(--surface)">${rows}<tr style="background:var(--surface2);font-weight:600;border-top:1.5px solid var(--border2)"><td style="padding:10px 14px">總計</td><td style="padding:10px 14px;text-align:right">${fM(grandT.spend)}<br><small style="color:var(--text3)">${fM(grandY.spend)}</small><br>${chgBadge(grandT.spend,grandY.spend)}</td><td style="padding:10px 14px;text-align:right">100%</td><td style="padding:10px 14px;text-align:right">${grandT.purchase>0?grandT.purchase:'-'}<br><small style="color:var(--text3)">${grandY.purchase>0?grandY.purchase:'-'}</small></td><td style="padding:10px 14px;text-align:right"><span style="color:${cpaCl(gTC,ci)};font-weight:700">${fM(gTC)}</span><br><small style="color:var(--text3)">${fM(gYC)}</small><br>${chgBadge(gTC,gYC,true)}</td><td style="padding:10px 14px;text-align:right;font-weight:600"><span style="color:${rc(gTR)}">${fX(gTR)}</span><br><small style="color:${rc(gYR)}">${fX(gYR)}</small></td></tr></tbody></table></div>`;
 }
 
-const _uiState = {};
-function getUiState(ci) {
-  if (!_uiState[ci]) _uiState[ci] = { period: '1d', filterKol: 'all', sortBy: 'spend', sortDir: 'desc' };
-  return _uiState[ci];
-}
-const _periodCache = {};
+const _uiState={};
+function getUiState(ci){if(!_uiState[ci])_uiState[ci]={period:'1d',filterKol:'all',sortBy:'spend',sortDir:'desc'};return _uiState[ci];}
+const _periodCache={};
 
-async function loadDetailPeriod(ci, period) {
-  getUiState(ci).period = period;
-  _syncPeriodButtons(ci, period);
-  if (_periodCache[ci + '_' + period]) { renderFlatTable(ci, _periodCache[ci + '_' + period]); return; }
-  const el = document.getElementById('creative-' + ci);
-  el.innerHTML = `<div class="period-loading">⏳ 載入數據中...</div>`;
-  try {
-    let since, until;
-    if (period === '7d') { const r = getExtendedDateRange(7); since = r.since; until = r.until; }
-    else if (period === '14d') { const r = getExtendedDateRange(14); since = r.since; until = r.until; }
-    else if (period === '30d') { const r = getExtendedDateRange(30); since = r.since; until = r.until; }
-    else { const { today } = getDateRange(); since = today; until = today; }
-    let all = [];
-    for (const acc of CLIENTS[ci].accounts) { const ads = await fetchAdInsights(acc, since, until); all = all.concat(ads); }
-    _periodCache[ci + '_' + period] = all;
-    renderFlatTable(ci, all);
-  } catch (e) { el.innerHTML = `<div class="period-loading" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`; }
+async function loadDetailPeriod(ci,period){
+  getUiState(ci).period=period;
+  document.querySelectorAll(`.period-btn[data-client="${ci}"]`).forEach(b=>b.classList.toggle('active',b.dataset.period===period));
+  if(_periodCache[ci+'_'+period]){renderFlatTable(ci,_periodCache[ci+'_'+period]);return;}
+  document.getElementById('creative-'+ci).innerHTML=`<div class="period-loading">⏳ 載入數據中...</div>`;
+  try{
+    let since,until;
+    if(period==='7d'){const r=getExtendedDateRange(7);since=r.since;until=r.until;}
+    else if(period==='14d'){const r=getExtendedDateRange(14);since=r.since;until=r.until;}
+    else if(period==='30d'){const r=getExtendedDateRange(30);since=r.since;until=r.until;}
+    else{const{today}=getDateRange();since=today;until=today;}
+    let all=[];
+    for(const acc of CLIENTS[ci].accounts){const ads=await fetchAdInsights(acc,since,until);all=all.concat(ads);}
+    _periodCache[ci+'_'+period]=all;renderFlatTable(ci,all);
+  }catch(e){document.getElementById('creative-'+ci).innerHTML=`<div class="period-loading" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`;}
 }
 
-function _syncPeriodButtons(ci, period) {
-  document.querySelectorAll(`.period-btn[data-client="${ci}"]`).forEach(b => { b.classList.toggle('active', b.dataset.period === period); });
+function setKolFilter(ci,val){
+  getUiState(ci).filterKol=val;
+  const period=getUiState(ci).period;
+  if(_periodCache[ci+'_'+period])renderFlatTable(ci,_periodCache[ci+'_'+period]);
+  document.querySelectorAll(`.filter-btn[data-client="${ci}"]`).forEach(b=>{b.classList.remove('active','kol-active','non-kol-active','all-active');if(b.dataset.filter===val){b.classList.add('active');if(val==='kol')b.classList.add('kol-active');else if(val==='non-kol')b.classList.add('non-kol-active');else b.classList.add('all-active');}});
 }
 
-function setKolFilter(ci, val) {
-  getUiState(ci).filterKol = val;
-  const period = getUiState(ci).period;
-  if (_periodCache[ci + '_' + period]) renderFlatTable(ci, _periodCache[ci + '_' + period]);
-  document.querySelectorAll(`.filter-btn[data-client="${ci}"]`).forEach(b => {
-    b.classList.remove('active', 'kol-active', 'non-kol-active', 'all-active');
-    if (b.dataset.filter === val) { b.classList.add('active'); if (val === 'kol') b.classList.add('kol-active'); else if (val === 'non-kol') b.classList.add('non-kol-active'); else b.classList.add('all-active'); }
-  });
+function setSort(ci,field){
+  const s=getUiState(ci);if(s.sortBy===field)s.sortDir=s.sortDir==='desc'?'asc':'desc';else{s.sortBy=field;s.sortDir=field==='cpa'?'asc':'desc';}
+  const period=s.period;if(_periodCache[ci+'_'+period])renderFlatTable(ci,_periodCache[ci+'_'+period]);
 }
 
-function setSort(ci, field) {
-  const s = getUiState(ci);
-  if (s.sortBy === field) { s.sortDir = s.sortDir === 'desc' ? 'asc' : 'desc'; }
-  else { s.sortBy = field; s.sortDir = field === 'cpa' ? 'asc' : 'desc'; }
-  const period = s.period;
-  if (_periodCache[ci + '_' + period]) renderFlatTable(ci, _periodCache[ci + '_' + period]);
-}
+function sortIcon(ci,field){const s=getUiState(ci);if(s.sortBy!==field)return'<span class="sort-icon">⇅</span>';return`<span class="sort-icon">${s.sortDir==='asc'?'▲':'▼'}</span>`;}
 
-function sortIcon(ci, field) {
-  const s = getUiState(ci);
-  if (s.sortBy !== field) return '<span class="sort-icon">⇅</span>';
-  return `<span class="sort-icon">${s.sortDir === 'asc' ? '▲' : '▼'}</span>`;
-}
-
-function renderFlatTable(ci, rawAds) {
-  const el = document.getElementById('creative-' + ci);
-  const s = getUiState(ci);
-  const { period, filterKol, sortBy, sortDir } = s;
-  const { today: d1 } = getDateRange();
-
-  const cachedData = _reportCache[ci];
-  const monthSpend = cachedData?.extra?.monthTotal ? parseFloat(cachedData.extra.monthTotal.spend || 0) : 0;
-  const activeAdsetNames = cachedData?.extra?.activeAdsetNames || new Set();
-  const activeAdsetMap = buildActiveAdsetMapFromInsights(cachedData?.adsToday || [], ci, activeAdsetNames);
-
-  let classifiedAds = mergeAdsByName(rawAds, ci)
-    .map(ad => ({ ...ad, _type: classType(ad._campaign || ad.campaign_name, ci) }))
-    .filter(ad => ad._type !== '__SKIP__');
-
-  if (filterKol === 'kol') classifiedAds = classifiedAds.filter(ad => isKolType(ad._type, ad.ad_name));
-  if (filterKol === 'non-kol') classifiedAds = classifiedAds.filter(ad => !isKolType(ad._type, ad.ad_name));
-
-  const sortFn = (a, b) => {
-    let va, vb;
-    if (sortBy === 'spend') { va = parseFloat(a.spend || 0); vb = parseFloat(b.spend || 0); }
-    else if (sortBy === 'cpa') { va = adcpa(a, 'purchase'); vb = adcpa(b, 'purchase'); if (va === 0) va = 9999999; if (vb === 0) vb = 9999999; }
-    else if (sortBy === 'purchase') { va = adv(a, 'purchase'); vb = adv(b, 'purchase'); }
-    else { va = parseFloat(a.spend || 0); vb = parseFloat(b.spend || 0); }
-    return sortDir === 'asc' ? va - vb : vb - va;
-  };
+function renderFlatTable(ci,rawAds){
+  const el=document.getElementById('creative-'+ci);const s=getUiState(ci);const{period,filterKol,sortBy,sortDir}=s;const{today:d1}=getDateRange();
+  const cachedData=_reportCache[ci];
+  const monthSpend=cachedData?.extra?.monthTotal?parseFloat(cachedData.extra.monthTotal.spend||0):0;
+  const activeAdsetNames=cachedData?.extra?.activeAdsetNames||new Set();
+  const activeAdsetMap=buildActiveAdsetMapFromInsights(cachedData?.adsToday||[],ci,activeAdsetNames);
+  let classifiedAds=mergeAdsByName(rawAds,ci).map(ad=>({...ad,_type:classType(ad._campaign||ad.campaign_name,ci)})).filter(ad=>ad._type!=='__SKIP__');
+  if(filterKol==='kol')classifiedAds=classifiedAds.filter(ad=>isKolType(ad._type,ad.ad_name));
+  if(filterKol==='non-kol')classifiedAds=classifiedAds.filter(ad=>!isKolType(ad._type,ad.ad_name));
+  const sortFn=(a,b)=>{let va,vb;if(sortBy==='spend'){va=parseFloat(a.spend||0);vb=parseFloat(b.spend||0);}else if(sortBy==='cpa'){va=adcpa(a,'purchase');vb=adcpa(b,'purchase');if(va===0)va=9999999;if(vb===0)vb=9999999;}else if(sortBy==='purchase'){va=adv(a,'purchase');vb=adv(b,'purchase');}else{va=parseFloat(a.spend||0);vb=parseFloat(b.spend||0);}return sortDir==='asc'?va-vb:vb-va;};
   classifiedAds.sort(sortFn);
-
-  if (classifiedAds.length === 0) { el.innerHTML = '<div class="period-loading" style="color:var(--text3)">此期間無廣告花費</div>'; return; }
-
-  const globalMax = Math.max(...classifiedAds.map(a => parseFloat(a.spend || 0)), 1);
-  let periodLabel = period === '7d' ? `近7天（${getExtendedDateRange(7).since} ～ ${getExtendedDateRange(7).until}）`
-    : period === '14d' ? `近14天（${getExtendedDateRange(14).since} ～ ${getExtendedDateRange(14).until}）`
-    : period === '30d' ? `近30天（${getExtendedDateRange(30).since} ～ ${getExtendedDateRange(30).until}）`
-    : `昨天（${d1}）`;
-
-  const filterLabel = filterKol === 'kol' ? '🌟 KOL 素材' : filterKol === 'non-kol' ? '非 KOL 素材' : '全部素材';
-  const thCls = (field) => `sortable-th${s.sortBy === field ? ' sort-active' : ''}`;
-
-  const tierLegend = `
-    <span style="font-size:11px;color:var(--text3);margin-left:8px">素材強度：</span>
-    <span class="tier-badge tier-T0" style="font-size:10px;width:auto;padding:1px 6px">T0</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥50組+月10萬</span>
-    <span class="tier-badge tier-T1" style="font-size:10px;width:auto;padding:1px 6px">T1</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥20組+月5萬</span>
-    <span class="tier-badge tier-T2" style="font-size:10px;width:auto;padding:1px 6px">T2</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥10組+月&lt;5萬</span>
-    <span class="tier-badge tier-T3" style="font-size:10px;width:auto;padding:1px 6px">T3</span><span style="font-size:10px;color:var(--text3)"> 其餘</span>`;
-
-  let rows = '';
-  for (const ad of classifiedAds) {
-    const isKol = isKolType(ad._type, ad.ad_name);
-    const spend = parseFloat(ad.spend || 0);
-    const impressions = parseFloat(ad.impressions || 0);
-    const outboundClicks = adob(ad);
-    const linkCtr = impressions > 0 ? outboundClicks / impressions * 100 : 0;
-    const purchase = adv(ad, 'purchase');
-    const cpa = adcpa(ad, 'purchase'), roas = spend > 0 ? adacv(ad, 'purchase') / spend : 0;
-    const cartCpa = adcpa(ad, 'add_to_cart');
-    const checkoutCpa = adcpa(ad, 'initiate_checkout');
-    const vPlay = gvid(ad, 'video_play_actions');
-    const vP25  = gvid(ad, 'video_p25_watched_actions');
-    const vP95  = gvid(ad, 'video_p95_watched_actions');
-    const vRetention = (vP25 > 0 && vP95 > 0) ? (vP95 / vP25 * 10) : null;
-    const rec = recommendAd(ad, ci);
-    const barW = Math.round(spend / globalMax * 60);
-    const dispName = (ad.ad_name || '').length > 38 ? (ad.ad_name || '').slice(0, 38) + '…' : (ad.ad_name || '未命名');
-    const kolTag = isKol ? '<span class="kol-tag">KOL</span>' : '';
-    const rowClass = isKol ? 'class="kol-row"' : '';
-    const retColor = vRetention !== null ? (vRetention >= 5 ? 'var(--green)' : vRetention >= 3 ? 'var(--amber)' : 'var(--red)') : 'var(--text3)';
-
-    const tier = calcCreativeTier(ad.ad_name, activeAdsetMap, monthSpend);
-    const activeCount = activeAdsetMap.get(normName(ad.ad_name)) || 0;
-    const tierHtml = `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-      ${tierBadgeHtml(tier)}
-      <span style="font-size:9px;color:var(--text3);white-space:nowrap">${activeCount}組</span>
-    </div>`;
-
-    rows += `<tr ${rowClass}>
-      <td style="padding:8px 10px;text-align:center;white-space:nowrap">${tierHtml}</td>
-      <td style="padding:8px 12px">
-        <div style="display:flex;align-items:flex-start;gap:4px">
-          ${isKol ? '<span class="kol-dot" style="margin-top:5px"></span>' : ''}
-          <div><div class="ad-name" title="${(ad.ad_name || '').replace(/</g, '&lt;')}">${dispName}${kolTag}</div></div>
-        </div>
-      </td>
-      <td style="padding:8px 12px;text-align:right">NT$${Math.round(spend).toLocaleString()}<br><div class="spend-bar-wrap"><div class="spend-bar" style="width:${barW}px"></div></div></td>
-      <td style="padding:8px 12px;text-align:right">${linkCtr > 0 ? linkCtr.toFixed(2) + '%' : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${cartCpa > 0 ? fM(cartCpa) : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${checkoutCpa > 0 ? fM(checkoutCpa) : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:${s.sortBy === 'purchase' ? '700' : '400'}">${purchase > 0 ? purchase : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:700"><span style="color:${cpaCl(cpa, ci)}">${fM(cpa)}</span></td>
-      <td style="padding:8px 12px;text-align:right;font-weight:600;color:${rc(roas)}">${fX(roas)}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vPlay > 0 ? Math.round(vPlay).toLocaleString() : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP25 > 0 ? Math.round(vP25).toLocaleString() : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP95 > 0 ? Math.round(vP95).toLocaleString() : '-'}</td>
-      <td style="padding:8px 12px;text-align:right;font-weight:600;color:${retColor}">${vRetention !== null ? vRetention.toFixed(1) + '成' : '-'}</td>
-      <td style="padding:8px 12px"><span class="rec-badge ${rec.badge}">${rec.label}</span></td>
-    </tr>`;
+  if(classifiedAds.length===0){el.innerHTML='<div class="period-loading" style="color:var(--text3)">此期間無廣告花費</div>';return;}
+  const globalMax=Math.max(...classifiedAds.map(a=>parseFloat(a.spend||0)),1);
+  let periodLabel=period==='7d'?`近7天（${getExtendedDateRange(7).since} ～ ${getExtendedDateRange(7).until}）`:period==='14d'?`近14天（${getExtendedDateRange(14).since} ～ ${getExtendedDateRange(14).until}）`:period==='30d'?`近30天（${getExtendedDateRange(30).since} ～ ${getExtendedDateRange(30).until}）`:`昨天（${d1}）`;
+  const filterLabel=filterKol==='kol'?'🌟 KOL 素材':filterKol==='non-kol'?'非 KOL 素材':'全部素材';
+  const thCls=(field)=>`sortable-th${s.sortBy===field?' sort-active':''}`;
+  const tierLegend=`<span style="font-size:11px;color:var(--text3);margin-left:8px">素材強度：</span><span class="tier-badge tier-T0" style="font-size:10px;width:auto;padding:1px 6px">T0</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥50組+月10萬</span><span class="tier-badge tier-T1" style="font-size:10px;width:auto;padding:1px 6px">T1</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥20組+月5萬</span><span class="tier-badge tier-T2" style="font-size:10px;width:auto;padding:1px 6px">T2</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥10組</span><span class="tier-badge tier-T3" style="font-size:10px;width:auto;padding:1px 6px">T3</span><span style="font-size:10px;color:var(--text3)"> 其餘</span>`;
+  let rows='';
+  for(const ad of classifiedAds){
+    const isKol=isKolType(ad._type,ad.ad_name);const spend=parseFloat(ad.spend||0);
+    const impressions=parseFloat(ad.impressions||0),outboundClicks=adob(ad),linkCtr=impressions>0?outboundClicks/impressions*100:0;
+    const purchase=adv(ad,'purchase'),cpa=adcpa(ad,'purchase'),roas=spend>0?adacv(ad,'purchase')/spend:0;
+    const cartCpa=adcpa(ad,'add_to_cart'),checkoutCpa=adcpa(ad,'initiate_checkout');
+    const vPlay=gvid(ad,'video_play_actions'),vP25=gvid(ad,'video_p25_watched_actions'),vP95=gvid(ad,'video_p95_watched_actions');
+    const vRetention=(vP25>0&&vP95>0)?(vP95/vP25*10):null;
+    const rec=recommendAd(ad,ci),barW=Math.round(spend/globalMax*60);
+    const dispName=(ad.ad_name||'').length>38?(ad.ad_name||'').slice(0,38)+'…':(ad.ad_name||'未命名');
+    const kolTag=isKol?'<span class="kol-tag">KOL</span>':'',rowClass=isKol?'class="kol-row"':'';
+    const retColor=vRetention!==null?(vRetention>=5?'var(--green)':vRetention>=3?'var(--amber)':'var(--red)'):'var(--text3)';
+    const tier=calcCreativeTier(ad.ad_name,activeAdsetMap,monthSpend);
+    const activeCount=activeAdsetMap.get(normName(ad.ad_name))||0;
+    const tierHtml=`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">${tierBadgeHtml(tier)}<span style="font-size:9px;color:var(--text3);white-space:nowrap">${activeCount}組</span></div>`;
+    rows+=`<tr ${rowClass}><td style="padding:8px 10px;text-align:center;white-space:nowrap">${tierHtml}</td><td style="padding:8px 12px"><div style="display:flex;align-items:flex-start;gap:4px">${isKol?'<span class="kol-dot" style="margin-top:5px"></span>':''}<div><div class="ad-name" title="${(ad.ad_name||'').replace(/</g,'&lt;')}">${dispName}${kolTag}</div></div></div></td><td style="padding:8px 12px;text-align:right">NT$${Math.round(spend).toLocaleString()}<br><div class="spend-bar-wrap"><div class="spend-bar" style="width:${barW}px"></div></div></td><td style="padding:8px 12px;text-align:right">${linkCtr>0?linkCtr.toFixed(2)+'%':'-'}</td><td style="padding:8px 12px;text-align:right;color:var(--text2)">${cartCpa>0?fM(cartCpa):'-'}</td><td style="padding:8px 12px;text-align:right;color:var(--text2)">${checkoutCpa>0?fM(checkoutCpa):'-'}</td><td style="padding:8px 12px;text-align:right;font-weight:${s.sortBy==='purchase'?'700':'400'}">${purchase>0?purchase:'-'}</td><td style="padding:8px 12px;text-align:right;font-weight:700"><span style="color:${cpaCl(cpa,ci)}">${fM(cpa)}</span></td><td style="padding:8px 12px;text-align:right;font-weight:600;color:${rc(roas)}">${fX(roas)}</td><td style="padding:8px 12px;text-align:right;color:var(--text2)">${vPlay>0?Math.round(vPlay).toLocaleString():'-'}</td><td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP25>0?Math.round(vP25).toLocaleString():'-'}</td><td style="padding:8px 12px;text-align:right;color:var(--text2)">${vP95>0?Math.round(vP95).toLocaleString():'-'}</td><td style="padding:8px 12px;text-align:right;font-weight:600;color:${retColor}">${vRetention!==null?vRetention.toFixed(1)+'成':'-'}</td><td style="padding:8px 12px"><span class="rec-badge ${rec.badge}">${rec.label}</span></td></tr>`;
   }
-
-  el.innerHTML = `
-    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;flex-wrap:wrap;align-items:center;gap:4px">
-      <span>統計區間：${periodLabel}｜${filterLabel} 共 <b>${classifiedAds.length}</b> 組｜CPA 顏色：綠=優秀 橘=普通 紅=差｜25→95% 顏色：綠≥5成 橘≥3成 紅&lt;3成</span>
-      ${tierLegend}
-    </div>
-    <div class="metrics-table">
-      <table class="creative-table">
-        <thead><tr>
-          <th style="text-align:center;min-width:52px">強度</th>
-          <th>廣告名稱</th>
-          <th style="text-align:right" class="${thCls('spend')}" onclick="setSort(${ci},'spend')">花費 ${sortIcon(ci, 'spend')}</th>
-          <th style="text-align:right">CTR(連結)</th>
-          <th style="text-align:right">加到購物車成本</th>
-          <th style="text-align:right">開始結帳成本</th>
-          <th style="text-align:right" class="${thCls('purchase')}" onclick="setSort(${ci},'purchase')">購買 ${sortIcon(ci, 'purchase')}</th>
-          <th style="text-align:right" class="${thCls('cpa')}" onclick="setSort(${ci},'cpa')">CPA ★ ${sortIcon(ci, 'cpa')}</th>
-          <th style="text-align:right">ROAS</th>
-          <th style="text-align:right">播放次數</th>
-          <th style="text-align:right">播放25%</th>
-          <th style="text-align:right">播放95%</th>
-          <th style="text-align:right">25→95%</th>
-          <th>建議</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
+  el.innerHTML=`<div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;flex-wrap:wrap;align-items:center;gap:4px"><span>統計區間：${periodLabel}｜${filterLabel} 共 <b>${classifiedAds.length}</b> 組｜CPA 顏色：綠=優秀 橘=普通 紅=差｜25→95% 顏色：綠≥5成 橘≥3成 紅&lt;3成</span>${tierLegend}</div><div class="metrics-table"><table class="creative-table"><thead><tr><th style="text-align:center;min-width:52px">強度</th><th>廣告名稱</th><th style="text-align:right" class="${thCls('spend')}" onclick="setSort(${ci},'spend')">花費 ${sortIcon(ci,'spend')}</th><th style="text-align:right">CTR(連結)</th><th style="text-align:right">加到購物車成本</th><th style="text-align:right">開始結帳成本</th><th style="text-align:right" class="${thCls('purchase')}" onclick="setSort(${ci},'purchase')">購買 ${sortIcon(ci,'purchase')}</th><th style="text-align:right" class="${thCls('cpa')}" onclick="setSort(${ci},'cpa')">CPA ★ ${sortIcon(ci,'cpa')}</th><th style="text-align:right">ROAS</th><th style="text-align:right">播放次數</th><th style="text-align:right">播放25%</th><th style="text-align:right">播放95%</th><th style="text-align:right">25→95%</th><th>建議</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-function buildMetricsTable(t, y) {
-  const rows = [
-    ['花費金額', fmt(t?.spend, 'money'), fmt(y?.spend, 'money'), t?.spend, y?.spend, true, false],
-    ['CTR 點擊率', fmt(t?.ctr, 'pct'), fmt(y?.ctr, 'pct'), t?.ctr, y?.ctr, false, false],
-    ['連結點擊次數', fmt(t?.clicks), fmt(y?.clicks), t?.clicks, y?.clicks, false, false],
-    ['連外點擊次數', fmt(gob(t)), fmt(gob(y)), gob(t), gob(y), false, false],
-    ['曝光次數', fmt(t?.impressions), fmt(y?.impressions), t?.impressions, y?.impressions, false, false],
-    ['觸及人數', fmt(t?.reach), fmt(y?.reach), t?.reach, y?.reach, false, false],
-    ['加到購物車次數', fmt(gv(t, 'add_to_cart')), fmt(gv(y, 'add_to_cart')), gv(t, 'add_to_cart'), gv(y, 'add_to_cart'), false, false],
-    ['每次加購成本', fmt(gcpa(t, 'add_to_cart'), 'money'), fmt(gcpa(y, 'add_to_cart'), 'money'), gcpa(t, 'add_to_cart'), gcpa(y, 'add_to_cart'), true, true],
-    ['開始結帳次數', fmt(gv(t, 'initiate_checkout')), fmt(gv(y, 'initiate_checkout')), gv(t, 'initiate_checkout'), gv(y, 'initiate_checkout'), false, false],
-    ['購買次數', fmt(gv(t, 'purchase')), fmt(gv(y, 'purchase')), gv(t, 'purchase'), gv(y, 'purchase'), false, false],
-    ['購買轉換值', fmt(gacv(t, 'purchase'), 'money'), fmt(gacv(y, 'purchase'), 'money'), gacv(t, 'purchase'), gacv(y, 'purchase'), false, false],
-    ['CPA ★', `<span style="color:${gcpa(t,'purchase')>0&&gcpa(t,'purchase')>gcpa(y,'purchase')?'var(--red)':'inherit'};font-weight:700">${fmt(gcpa(t,'purchase'),'money')}</span>`, fmt(gcpa(y, 'purchase'), 'money'), gcpa(t, 'purchase'), gcpa(y, 'purchase'), true, true],
-    ['ROAS', fmt(t?.spend > 0 ? gacv(t, 'purchase') / t.spend : 0, 'x'), fmt(y?.spend > 0 ? gacv(y, 'purchase') / y.spend : 0, 'x'), t?.spend > 0 ? gacv(t, 'purchase') / t.spend : 0, y?.spend > 0 ? gacv(y, 'purchase') / y.spend : 0, false, false],
-    ['轉換率', fmt(t?.clicks > 0 ? gv(t, 'purchase') / t.clicks * 100 : 0, 'pct'), fmt(y?.clicks > 0 ? gv(y, 'purchase') / y.clicks * 100 : 0, 'pct'), t?.clicks > 0 ? gv(t, 'purchase') / t.clicks * 100 : 0, y?.clicks > 0 ? gv(y, 'purchase') / y.clicks * 100 : 0, false, false],
-    ['貼文互動次數', fmt(gv(t, 'post_engagement')), fmt(gv(y, 'post_engagement')), gv(t, 'post_engagement'), gv(y, 'post_engagement'), false, false],
-    ['影片播放次數', fmt(gvid(t, 'video_play_actions')), fmt(gvid(y, 'video_play_actions')), gvid(t, 'video_play_actions'), gvid(y, 'video_play_actions'), false, false],
-    ['影片播放25%', fmt(gvid(t, 'video_p25_watched_actions')), fmt(gvid(y, 'video_p25_watched_actions')), gvid(t, 'video_p25_watched_actions'), gvid(y, 'video_p25_watched_actions'), false, false],
-    ['影片播放100%', fmt(gvid(t, 'video_p100_watched_actions')), fmt(gvid(y, 'video_p100_watched_actions')), gvid(t, 'video_p100_watched_actions'), gvid(y, 'video_p100_watched_actions'), false, false],
-  ];
-  return `<div class="metrics-table"><table>
-    <thead><tr><th>指標</th><th>昨天</th><th>前天</th><th>變化</th></tr></thead>
-    <tbody>${rows.map(([l, tv, yv, tR, yR, lb, skip]) => {
-    if (skip && tR === 0 && yR === 0) return `<tr><td>${l}</td><td colspan="3" style="color:var(--text3)">暫無資料</td></tr>`;
-    return `<tr><td>${l}</td><td><b>${tv}</b></td><td style="color:var(--text3)">${yv}</td><td>${chgBadge(tR, yR, lb)}</td></tr>`;
-  }).join('')}</tbody>
-  </table></div>`;
+function buildMetricsTable(t,y){
+  const rows=[['花費金額',fmt(t?.spend,'money'),fmt(y?.spend,'money'),t?.spend,y?.spend,true,false],['CTR 點擊率',fmt(t?.ctr,'pct'),fmt(y?.ctr,'pct'),t?.ctr,y?.ctr,false,false],['連結點擊次數',fmt(t?.clicks),fmt(y?.clicks),t?.clicks,y?.clicks,false,false],['連外點擊次數',fmt(gob(t)),fmt(gob(y)),gob(t),gob(y),false,false],['曝光次數',fmt(t?.impressions),fmt(y?.impressions),t?.impressions,y?.impressions,false,false],['觸及人數',fmt(t?.reach),fmt(y?.reach),t?.reach,y?.reach,false,false],['加到購物車次數',fmt(gv(t,'add_to_cart')),fmt(gv(y,'add_to_cart')),gv(t,'add_to_cart'),gv(y,'add_to_cart'),false,false],['每次加購成本',fmt(gcpa(t,'add_to_cart'),'money'),fmt(gcpa(y,'add_to_cart'),'money'),gcpa(t,'add_to_cart'),gcpa(y,'add_to_cart'),true,true],['開始結帳次數',fmt(gv(t,'initiate_checkout')),fmt(gv(y,'initiate_checkout')),gv(t,'initiate_checkout'),gv(y,'initiate_checkout'),false,false],['購買次數',fmt(gv(t,'purchase')),fmt(gv(y,'purchase')),gv(t,'purchase'),gv(y,'purchase'),false,false],['購買轉換值',fmt(gacv(t,'purchase'),'money'),fmt(gacv(y,'purchase'),'money'),gacv(t,'purchase'),gacv(y,'purchase'),false,false],['CPA ★',`<span style="color:${gcpa(t,'purchase')>0&&gcpa(t,'purchase')>gcpa(y,'purchase')?'var(--red)':'inherit'};font-weight:700">${fmt(gcpa(t,'purchase'),'money')}</span>`,fmt(gcpa(y,'purchase'),'money'),gcpa(t,'purchase'),gcpa(y,'purchase'),true,true],['ROAS',fmt(t?.spend>0?gacv(t,'purchase')/t.spend:0,'x'),fmt(y?.spend>0?gacv(y,'purchase')/y.spend:0,'x'),t?.spend>0?gacv(t,'purchase')/t.spend:0,y?.spend>0?gacv(y,'purchase')/y.spend:0,false,false],['轉換率',fmt(t?.clicks>0?gv(t,'purchase')/t.clicks*100:0,'pct'),fmt(y?.clicks>0?gv(y,'purchase')/y.clicks*100:0,'pct'),t?.clicks>0?gv(t,'purchase')/t.clicks*100:0,y?.clicks>0?gv(y,'purchase')/y.clicks*100:0,false,false],['貼文互動次數',fmt(gv(t,'post_engagement')),fmt(gv(y,'post_engagement')),gv(t,'post_engagement'),gv(y,'post_engagement'),false,false],['影片播放次數',fmt(gvid(t,'video_play_actions')),fmt(gvid(y,'video_play_actions')),gvid(t,'video_play_actions'),gvid(y,'video_play_actions'),false,false],['影片播放25%',fmt(gvid(t,'video_p25_watched_actions')),fmt(gvid(y,'video_p25_watched_actions')),gvid(t,'video_p25_watched_actions'),gvid(y,'video_p25_watched_actions'),false,false],['影片播放100%',fmt(gvid(t,'video_p100_watched_actions')),fmt(gvid(y,'video_p100_watched_actions')),gvid(t,'video_p100_watched_actions'),gvid(y,'video_p100_watched_actions'),false,false]];
+  return`<div class="metrics-table"><table><thead><tr><th>指標</th><th>昨天</th><th>前天</th><th>變化</th></tr></thead><tbody>${rows.map(([l,tv,yv,tR,yR,lb,skip])=>{if(skip&&tR===0&&yR===0)return`<tr><td>${l}</td><td colspan="3" style="color:var(--text3)">暫無資料</td></tr>`;return`<tr><td>${l}</td><td><b>${tv}</b></td><td style="color:var(--text3)">${yv}</td><td>${chgBadge(tR,yR,lb)}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 
-function buildTopKPIs(t, y) {
-  const st = t?.spend || 0, sy = y?.spend || 0;
-  const pt = gv(t, 'purchase'), py = gv(y, 'purchase');
-  const ct = gcpa(t, 'purchase'), cy = gcpa(y, 'purchase');
-  const rt = st > 0 ? gacv(t, 'purchase') / st : 0, ry = sy > 0 ? gacv(y, 'purchase') / sy : 0;
-  return `<div class="day-compare">
-    <div class="day-card"><h3><span class="day-dot-today"></span>昨天</h3>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(st, 'money')}</div></div>
-        <div class="kpi"><div class="kpi-label">購買</div><div class="kpi-value">${fmt(pt)}</div></div>
-        <div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(ct, 'money')}</div></div>
-      </div>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(rt, 'x')}</div></div>
-        <div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(t?.ctr, 'pct')}</div></div>
-      </div>
-    </div>
-    <div class="day-card"><h3><span class="day-dot-yest"></span>前天</h3>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(sy, 'money')}</div></div>
-        <div class="kpi"><div class="kpi-label">購買</div><div class="kpi-value">${fmt(py)}</div></div>
-        <div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(cy, 'money')}</div></div>
-      </div>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(ry, 'x')}</div></div>
-        <div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(y?.ctr, 'pct')}</div></div>
-      </div>
-    </div>
-  </div>`;
+function buildTopKPIs(t,y){
+  const st=t?.spend||0,sy=y?.spend||0,pt=gv(t,'purchase'),py=gv(y,'purchase'),ct=gcpa(t,'purchase'),cy=gcpa(y,'purchase'),rt=st>0?gacv(t,'purchase')/st:0,ry=sy>0?gacv(y,'purchase')/sy:0;
+  return`<div class="day-compare"><div class="day-card"><h3><span class="day-dot-today"></span>昨天</h3><div class="kpi-row"><div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(st,'money')}</div></div><div class="kpi"><div class="kpi-label">購買</div><div class="kpi-value">${fmt(pt)}</div></div><div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(ct,'money')}</div></div></div><div class="kpi-row"><div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(rt,'x')}</div></div><div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(t?.ctr,'pct')}</div></div></div></div><div class="day-card"><h3><span class="day-dot-yest"></span>前天</h3><div class="kpi-row"><div class="kpi"><div class="kpi-label">花費</div><div class="kpi-value" style="font-size:16px">${fmt(sy,'money')}</div></div><div class="kpi"><div class="kpi-label">購買</div><div class="kpi-value">${fmt(py)}</div></div><div class="kpi"><div class="kpi-label">CPA ★</div><div class="kpi-value" style="font-size:15px">${fmt(cy,'money')}</div></div></div><div class="kpi-row"><div class="kpi"><div class="kpi-label">ROAS</div><div class="kpi-value">${fmt(ry,'x')}</div></div><div class="kpi"><div class="kpi-label">CTR</div><div class="kpi-value">${fmt(y?.ctr,'pct')}</div></div></div></div></div>`;
 }
 
-// ── MODIFIED: renderClient — 素材明細 now comes BEFORE 詳細指標對比 ──
-function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extra = {}) {
-  const content = document.getElementById('content-' + ci);
-  const { today, yesterday } = getDateRange();
-  const r30 = getExtendedDateRange(30);
-
-  content.innerHTML = `
+function renderClient(ci,todayData,yesterdayData,adsToday,adsYesterday,extra={}){
+  const content=document.getElementById('content-'+ci);
+  const{today,yesterday}=getDateRange();const r30=getExtendedDateRange(30);
+  content.innerHTML=`
     <div style="font-size:12px;color:var(--text3);margin-bottom:12px">昨天 ${today}（主）｜前天 ${yesterday}</div>
-
     <div class="daily-report-box">
-      <div class="daily-report-header">
-        <h2>📋 昨日廣告日報</h2>
-      </div>
-      <div class="daily-report-body" id="daily-report-${ci}">
-        <div class="report-loading">⏳ 產生日報中...</div>
-      </div>
+      <div class="daily-report-header"><h2>📋 昨日廣告日報</h2></div>
+      <div class="daily-report-body" id="daily-report-${ci}"><div class="report-loading">⏳ 產生日報中...</div></div>
     </div>
-
     <div class="section-title">廣告類型分組總覽</div>
     <div id="creative-summary-${ci}"></div>
-
-    ${buildTopKPIs(todayData, yesterdayData)}
-
+    ${buildTopKPIs(todayData,yesterdayData)}
     <div class="section-title" style="margin-top:24px">素材明細（依花費排序）</div>
     <div class="creative-controls">
       <div class="controls-group">
@@ -1051,63 +763,65 @@ function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extr
       </div>
     </div>
     <div id="creative-${ci}"><div class="period-loading">載入中...</div></div>
-
     <div class="section-title" style="margin-top:28px">詳細指標對比</div>
-    ${buildMetricsTable(todayData, yesterdayData)}
-
+    ${buildMetricsTable(todayData,yesterdayData)}
     <div class="section-title" style="margin-top:28px">🌟 KOL 受眾測試追蹤（近30天 ${r30.since} ～ ${r30.until}）</div>
     <div class="kol-audience-box">
       <div class="kol-audience-header">
         <h3>🌟 KOL 興趣受眾測試分析</h3>
         <span>花費 &gt; NT$100 才計入｜受眾去重｜排除 RT</span>
       </div>
-      <div id="kol-audience-${ci}"><div class="report-loading">載入中...</div></div>
+      <div class="kol-audience-body">
+        <div class="wc-toggle">
+          <button class="wc-toggle-btn active wc-tb-${ci}" data-view="cloud" onclick="switchKolView(${ci},'cloud')">☁ 文字雲</button>
+          <button class="wc-toggle-btn wc-tb-${ci}"        data-view="list"  onclick="switchKolView(${ci},'list')">≡ 清單</button>
+        </div>
+        <div id="kol-wc-wrap-${ci}"><div class="wc-empty-msg">載入中...</div></div>
+        <div id="kol-list-${ci}" style="display:none"><div style="color:var(--text3);font-size:13px;padding:12px 0;text-align:center">載入中...</div></div>
+      </div>
     </div>`;
 
-  _reportCache[ci] = { todayData, adsToday, extra };
+  _reportCache[ci]={todayData,adsToday,extra};
+  if(todayData) document.getElementById('daily-report-'+ci).innerHTML=buildDailyReport(ci,todayData,adsToday,extra);
+  document.getElementById('creative-summary-'+ci).innerHTML=buildCreativeSummary(ci,adsToday,adsYesterday);
 
-  if (todayData) {
-    document.getElementById('daily-report-' + ci).innerHTML = buildDailyReport(ci, todayData, adsToday, extra);
-  }
+  // 建立 KOL 受眾資料並渲染（每 KOL 各自文字雲）
+  const ads30d=extra.ads30d||[];
+  const{kolMap,audMap}=buildKolMaps(ads30d,ci);
+  _kolCache[ci]={kolMap,audMap};
+  setTimeout(()=>{
+    renderKolSection(ci);
+  },200);
 
-  document.getElementById('creative-summary-' + ci).innerHTML = buildCreativeSummary(ci, adsToday, adsYesterday);
-  document.getElementById('kol-audience-' + ci).innerHTML = buildKolAudienceBlock(ci, extra.ads30d || []);
-
-  _periodCache[ci + '_1d'] = adsToday;
-  _uiState[ci] = { period: '1d', filterKol: 'all', sortBy: 'spend', sortDir: 'desc' };
-  renderFlatTable(ci, adsToday);
+  _periodCache[ci+'_1d']=adsToday;
+  _uiState[ci]={period:'1d',filterKol:'all',sortBy:'spend',sortDir:'desc'};
+  renderFlatTable(ci,adsToday);
 }
 
-async function loadClient(ci) {
-  const dot = document.getElementById('status-dot-' + ci);
-  const txt = document.getElementById('status-text-' + ci);
-  const errEl = document.getElementById('error-' + ci);
-  dot.className = 'status-dot loading'; txt.textContent = '資料載入中...'; errEl.innerHTML = '';
-  try {
-    const data = await fetchClientData(ci);
-    dot.className = 'status-dot ok'; txt.textContent = '資料已更新';
-    renderClient(ci, data.today, data.yesterday, data.adsToday || [], data.adsYesterday || [], {
-      monthTotal: data.monthTotal,
-      adsetCountToday: data.adsetCountToday,
-      adsetCountYesterday: data.adsetCountYesterday,
-      ads30d: data.ads30d || [],
-      activeAdsetNames: data.activeAdsetNames || new Set(),
-    });
-  } catch (e) {
-    dot.className = 'status-dot error'; txt.textContent = '資料載入失敗';
-    errEl.innerHTML = `<div class="error-msg">⚠️ 無法取得資料：${e.message}</div>`;
+async function loadClient(ci){
+  const dot=document.getElementById('status-dot-'+ci);
+  const txt=document.getElementById('status-text-'+ci);
+  const errEl=document.getElementById('error-'+ci);
+  dot.className='status-dot loading';txt.textContent='資料載入中...';errEl.innerHTML='';
+  try{
+    const data=await fetchClientData(ci);
+    dot.className='status-dot ok';txt.textContent='資料已更新';
+    renderClient(ci,data.today,data.yesterday,data.adsToday||[],data.adsYesterday||[],{monthTotal:data.monthTotal,adsetCountToday:data.adsetCountToday,adsetCountYesterday:data.adsetCountYesterday,ads30d:data.ads30d||[],activeAdsetNames:data.activeAdsetNames||new Set()});
+  }catch(e){
+    dot.className='status-dot error';txt.textContent='資料載入失敗';
+    errEl.innerHTML=`<div class="error-msg">⚠️ 無法取得資料：${e.message}</div>`;
   }
 }
 
-function loadAllData() {
-  const { today: d1, yesterday: d2 } = getDateRange();
-  document.getElementById('todayBadge').textContent = '昨 ' + d1 + ' / 前 ' + d2;
-  loadClient(0); loadClient(1);
+function loadAllData(){
+  const{today:d1,yesterday:d2}=getDateRange();
+  document.getElementById('todayBadge').textContent='昨 '+d1+' / 前 '+d2;
+  loadClient(0);loadClient(1);
 }
 
-function switchClient(idx) {
-  document.querySelectorAll('.client-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
-  document.querySelectorAll('.client-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+function switchClient(idx){
+  document.querySelectorAll('.client-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.client-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
 }
 
 loadAllData();
