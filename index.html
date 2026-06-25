@@ -44,30 +44,15 @@
   .daily-report-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
   .daily-report-header { background: linear-gradient(135deg,#0d47a1 0%,#1877f2 100%); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
   .daily-report-header h2 { color: #fff; font-size: 15px; font-weight: 700; }
-  .copy-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: background 0.15s; }
-  .copy-btn:hover { background: rgba(255,255,255,0.35); }
-  .copy-btn.copied { background: rgba(46,125,50,0.6); }
   .daily-report-body { padding: 18px 20px; }
   .report-section { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid var(--border); }
   .report-section:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
   .report-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
-  .report-text { font-size: 14px; color: var(--text); line-height: 1.9; }
   .report-loading { padding: 24px; text-align: center; color: var(--text3); font-size: 13px; }
   .kpi-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
   .kpi-chip { background: var(--surface2); border-radius: 8px; padding: 8px 14px; min-width: 90px; }
   .kpi-chip-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
   .kpi-chip-value { font-size: 16px; font-weight: 700; color: var(--text); }
-
-  .ai-report-wrap { position: relative; }
-  .ai-report-text { font-size: 14px; color: var(--text); line-height: 2; min-height: 60px; white-space: pre-wrap; word-break: break-word; }
-  .ai-report-text .cursor { display: inline-block; width: 2px; height: 1em; background: #1877f2; margin-left: 2px; vertical-align: text-bottom; animation: blink 0.8s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-  .ai-generating-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); margin-bottom: 10px; padding: 6px 10px; background: var(--blue-bg); border-radius: 6px; }
-  .ai-spinner { width: 14px; height: 14px; border: 2px solid #bbdefb; border-top-color: #1877f2; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .ai-regen-btn { font-size: 11px; color: #1877f2; border: 0.5px solid #bbdefb; background: var(--surface); padding: 3px 10px; border-radius: 20px; cursor: pointer; margin-left: auto; white-space: nowrap; }
-  .ai-regen-btn:hover { background: var(--blue-bg); }
-  .ai-error-msg { font-size: 13px; color: var(--red); padding: 8px 0; }
 
   .day-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
   .day-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
@@ -136,15 +121,12 @@
   .spend-bar-wrap { width:60px;height:6px;background:var(--surface2);border-radius:3px;display:inline-block;vertical-align:middle; }
   .spend-bar { height:6px;border-radius:3px;background:#1877f2; }
 
-  /* ── 素材強度 badge ── */
   .tier-badge { display:inline-flex; align-items:center; justify-content:center; width:32px; height:22px; border-radius:6px; font-size:11px; font-weight:800; letter-spacing:0.02em; white-space:nowrap; }
   .tier-T0 { background:#1a237e; color:#fff; }
   .tier-T1 { background:#1565c0; color:#fff; }
   .tier-T2 { background:#e65100; color:#fff; }
   .tier-T3 { background:var(--surface2); color:var(--text2); border: 0.5px solid var(--border2); }
-  .tier-loading { background:var(--surface2); color:var(--text3); font-size:10px; }
 
-  /* ── KOL 受眾測試區塊 ── */
   .kol-audience-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
   .kol-audience-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
   .kol-audience-header h3 { color: #fff; font-size: 14px; font-weight: 700; }
@@ -158,12 +140,7 @@
   .kol-audience-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .kol-audience-chip { background: #f3e5f5; border: 0.5px solid #ce93d8; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #4a148c; display: flex; align-items: center; gap: 5px; }
   .kol-audience-chip .chip-spend { font-size: 11px; color: #7b1fa2; font-weight: 600; }
-  .kol-total-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
-  .kol-total-item { background: var(--surface2); border-radius: 8px; padding: 6px 14px; font-size: 12px; }
-  .kol-total-item span { color: var(--text3); margin-right: 4px; }
-  .kol-total-item strong { color: var(--text); }
 
-  /* ── KOL 素材小計區塊 ── */
   .kol-summary-box { background: var(--surface); border: 0.5px solid #ce93d8; border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
   .kol-summary-header { background: linear-gradient(135deg,#4a148c 0%,#7b1fa2 100%); padding: 10px 16px; }
   .kol-summary-header h3 { color: #fff; font-size: 13px; font-weight: 700; }
@@ -292,9 +269,6 @@ function mergeInsights(arr) {
 
 function normName(name) { if(!name) return '未命名'; return name.replace(/(\s*-\s*複本)+\s*$/g,'').trim(); }
 
-// ── 廣告類型分類邏輯 ──
-// 丰丹：行銷活動命名「轉換｜興趣」「轉換｜KOL」「轉換｜RT」「轉換｜ASC」「轉換｜類似」「互動｜RT」
-// 花現喜福：「TW - 轉換 - 興趣」「TW - 轉換 - KOL」「TW - 轉換 - RT」「TW - 轉換 - ASC」「TW - 轉換 - 類似」
 function classType(camp, ci) {
   const t = (camp || '').toUpperCase();
   if (t.includes('素材')) return '__SKIP__';
@@ -317,21 +291,9 @@ function isKolType(type, adName) {
   return false;
 }
 
-/* ══════════════════════════════════════════════
-   素材強度（Tier）計算
-   判斷條件（兩者同時滿足）：
-   T0: 開啟 adset ≥ 50 且 帳戶月花費 ≥ 100,000
-   T1: 開啟 adset ≥ 20 且 帳戶月花費 ≥ 50,000
-   T2: 開啟 adset ≥ 10 且 帳戶月花費 <  50,000
-   T3: 開啟 adset <  10 且 帳戶月花費 <  50,000
-
-   activeAdsetMap: Map<normAdName, count> — 該素材對應的開啟 adset 數
-   monthSpend: 帳戶本月總花費（數字）
-══════════════════════════════════════════════ */
 function calcCreativeTier(adName, activeAdsetMap, monthSpend) {
   const count = activeAdsetMap.get(normName(adName)) || 0;
   const ms = monthSpend || 0;
-
   if (count >= 50 && ms >= 100000) return 'T0';
   if (count >= 20 && ms >= 50000)  return 'T1';
   if (count >= 10 && ms < 50000)   return 'T2';
@@ -342,24 +304,7 @@ function tierBadgeHtml(tier) {
   return `<span class="tier-badge tier-${tier}">${tier}</span>`;
 }
 
-/* ══════════════════════════════════════════════
-   拉 Active Adset 列表（方案 A：API 真實狀態）
-   只計 興趣、類似、KOL，排除 RT、ASC
-   只計 effective_status = ACTIVE（學習）或 LEARNING_LIMITED（學習效果有限）
-   排除 SCHEDULED（已排定時間）及其他非投遞中狀態
-   回傳 Map<normAdName, count>
-══════════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════════
-   拉 Active Adset 列表
-   effective_status=ACTIVE 涵蓋「學習中」「學習效果有限」「正常投遞」
-   排除 RT、ASC、素材、流量/互動/觀看
-   回傳 Map<normAdName, count>
-══════════════════════════════════════════════ */
 async function fetchActiveAdsetMap(accountId) {
-  // 只拉 adset 清單（一次 API），不再用 batch 拉 ads
-  // 回傳 Set<adsetName>（開啟中、符合類型的 adset 名稱集合）
-  // 之後在 buildActiveAdsetMapFromInsights 用 adsToday 的 adset_name 交叉比對
   const adsetFields = 'id,name,effective_status,campaign{name}';
   let adsets = [];
   let url = `https://graph.facebook.com/v19.0/act_${accountId}/adsets?fields=${adsetFields}&effective_status=["ACTIVE"]&limit=200&access_token=${TOKEN}`;
@@ -371,8 +316,6 @@ async function fetchActiveAdsetMap(accountId) {
     if (data.data) adsets = adsets.concat(data.data);
     url = data.paging?.next || null; pg++;
   }
-
-  // 過濾 campaign 類型，回傳有效 adset 的名稱 Set
   const validAdsetNames = new Set();
   for (const adset of adsets) {
     const campName = (adset.campaign?.name || '').toUpperCase();
@@ -386,8 +329,6 @@ async function fetchActiveAdsetMap(accountId) {
   return validAdsetNames;
 }
 
-// 用 adsToday insights + activeAdsetNames 交叉計算素材強度
-// activeAdsetNames: Set<adsetName>（開啟中的 adset 名稱）
 function buildActiveAdsetMapFromInsights(adsToday, ci, activeAdsetNames) {
   const adNameToAdsetSet = new Map();
   for (const ad of adsToday) {
@@ -399,7 +340,6 @@ function buildActiveAdsetMapFromInsights(adsToday, ci, activeAdsetNames) {
     if (campName.includes('ASC')) continue;
     const adsetKey = (ad.adset_name || '').trim();
     if (!adsetKey) continue;
-    // 只計入目前開啟中的 adset
     if (activeAdsetNames && activeAdsetNames.size > 0 && !activeAdsetNames.has(adsetKey)) continue;
     const key = normName(ad.ad_name);
     if (!adNameToAdsetSet.has(key)) adNameToAdsetSet.set(key, new Set());
@@ -410,20 +350,14 @@ function buildActiveAdsetMapFromInsights(adsToday, ci, activeAdsetNames) {
   return result;
 }
 
-/* ══════════════════════════════════════════════
-   KOL 受眾測試分析
-══════════════════════════════════════════════ */
-// ── KOL 受眾測試解析（支援丰丹｜格式及花現喜福 - 格式）──
 function parseKolAdset(adsetName, ci) {
   const name = (adsetName || '').trim();
   if (name.toUpperCase().includes('RT')) return null;
 
   let parts = [];
   if (ci === 0) {
-    // 丰丹：以「｜」分隔
     parts = name.split(/\s*[｜|]\s*/);
   } else {
-    // 花現喜福：以「 - 」分隔
     parts = name.split(/\s*-\s*/);
   }
 
@@ -446,7 +380,7 @@ function parseKolAdset(adsetName, ci) {
   return { audience, kolName };
 }
 
-function buildKolAudienceStats(rawAds) {
+function buildKolAudienceStats(rawAds, ci) {
   const adsetSpend = {};
   for (const ad of rawAds) {
     const spend = parseFloat(ad.spend || 0);
@@ -458,7 +392,7 @@ function buildKolAudienceStats(rawAds) {
   const kolMap = {};
   for (const [adsetName, spend] of Object.entries(adsetSpend)) {
     if (spend < 100) continue;
-    const parsed = parseKolAdset(adsetName);
+    const parsed = parseKolAdset(adsetName, ci);
     if (!parsed) continue;
     const { audience, kolName } = parsed;
     if (!kolMap[kolName]) kolMap[kolName] = { audiences: {}, totalSpend: 0, adsetSet: new Set() };
@@ -503,9 +437,6 @@ function buildKolAudienceBlock(ci, rawAds) {
   return `<div class="kol-audience-body">${body}</div>`;
 }
 
-/* ══════════════════════════════════════════════
-   KOL 素材小計區塊
-══════════════════════════════════════════════ */
 function buildKolSummaryBlock(ci, rawAds) {
   const kolAds = rawAds.filter(ad => {
     if (parseFloat(ad.spend || 0) <= 0) return false;
@@ -580,7 +511,7 @@ function buildKolSummaryBlock(ci, rawAds) {
 
 function recommendAd(ad, ci) {
   const spend=parseFloat(ad.spend||0), cpa=adcpa(ad,'purchase'), roas=spend>0?adacv(ad,'purchase')/spend:0;
-  const purchase=adv(ad,'purchase'), cart=adv(ad,'add_to_cart'), ctr=parseFloat(ad.ctr||0);
+  const purchase=adv(ad,'purchase'), cart=adv(ad,'add_to_cart');
   const thr=CLIENTS[ci].cpa;
 
   if(spend<300) return {badge:'rec-watch',label:'觀察中',reason:`花費 NT$${Math.round(spend)}，資料不足`};
@@ -625,29 +556,13 @@ async function fetchAdInsights(accountId, s, e) {
   return all;
 }
 
-async function fetchAdsetInsights(accountId, s, e) {
-  const end = e || s; let all = [];
-  const fields = 'adset_name,campaign_name,spend,actions,action_values,cost_per_action_type';
-  let url = `https://graph.facebook.com/v19.0/act_${accountId}/insights?fields=${fields}&time_range={"since":"${s}","until":"${end}"}&level=adset&limit=200&access_token=${TOKEN}`;
-  let pg = 0;
-  while (url && pg < 5) {
-    const res = await fetch(url); const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    if (data.data) all = all.concat(data.data);
-    url = data.paging?.next || null; pg++;
-  }
-  return all;
-}
-
 async function fetchClientData(ci) {
   const client=CLIENTS[ci]; const{today,yesterday}=getDateRange();
   const now=new Date(); const m1=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
   const res={today:[],yesterday:[],adsToday:[],adsYesterday:[],monthTotal:[],adsPrev:[],ads30d:[]};
-  const r30=getExtendedDateRange(30);
   const r15a=getExtendedDateRange(15);
   const r15b={since:getExtendedDateRange(30).since, until:getExtendedDateRange(16).since};
 
-  // 拉各帳號開啟中的 adset 名稱集合（只需一次 API，不用 batch）
   const mergedActiveAdsetNames = new Set();
   for (const acc of client.accounts) {
     const names = await fetchActiveAdsetMap(acc).catch(() => new Set());
@@ -732,9 +647,7 @@ function mergeAdsByName(rawAds, ci) {
         for(const item of ad[f]){const ex=base[f].find(x=>x.action_type===item.action_type);if(ex)ex.value=String(parseFloat(ex.value||0)+parseFloat(item.value||0));else base[f].push(JSON.parse(JSON.stringify(item)));}
       };
       mArr('actions');mArr('action_values');mArr('outbound_clicks');
-      mArr('video_play_actions');
-      mArr('video_p25_watched_actions');
-      mArr('video_p95_watched_actions');
+      mArr('video_play_actions');mArr('video_p25_watched_actions');mArr('video_p95_watched_actions');
       const imp=parseInt(base.impressions||0),clk=parseInt(base.clicks||0);
       base.ctr=imp>0?String((clk/imp*100).toFixed(4)):'0';
       const sp=parseFloat(base.spend||0); base.cost_per_action_type=[];
@@ -754,240 +667,8 @@ function sumType(rawAds, type, ci){
   return{spend:s,purchase:p,acv:a,cart:c,cpa:p>0?s/p:0,roas:s>0?a/s:0};
 }
 
-/* AI 口述稿生成 */
-function buildAIPrompt(ci, todayData, adsToday, extra) {
-  const client = CLIENTS[ci];
-  const thr = client.cpa;
-  const { today } = getDateRange();
-
-  const spend = parseFloat(todayData?.spend || 0);
-  const purchase = gv(todayData, 'purchase');
-  const cpa = gcpa(todayData, 'purchase');
-  const acv = gacv(todayData, 'purchase');
-  const roas = spend > 0 ? acv / spend : 0;
-  const ctr = parseFloat(todayData?.ctr || 0);
-  const clicks = parseFloat(todayData?.clicks || 0);
-  const convRate = clicks > 0 ? purchase / clicks * 100 : 0;
-
-  const mo = extra.monthTotal || null;
-  const moPurchase = mo ? Math.round(gv(mo, 'purchase')) : 0;
-  const moAcv = mo ? gacv(mo, 'purchase') : 0;
-  const goalOrders = loadGoal(ci, 'orders');
-  const nowDate = new Date();
-  const dayOfMonth = nowDate.getDate() - 1;
-  const daysInMonth = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0).getDate();
-  const daysLeft = daysInMonth - dayOfMonth;
-  const needOrders = goalOrders > 0 ? Math.max(0, goalOrders - moPurchase) : 0;
-  const achRate = goalOrders > 0 ? (moPurchase / goalOrders * 100) : 0;
-  const dailyAvg = dayOfMonth > 0 ? moPurchase / dayOfMonth : 0;
-
-  const typeOrder = ['流量/互動/觀看','ASC','KOL','興趣','類似','RT','其他'];
-
-  const typeStats = {};
-  for (const t of typeOrder) {
-    const s = sumType(adsToday, t, ci);
-    if (s.spend > 0) typeStats[t] = s;
-  }
-
-  const adsetByType = {};
-  for (const ad of adsToday) {
-    if (parseFloat(ad.spend || 0) <= 0) continue;
-    const type = classType(ad.campaign_name, ci);
-    if (type === '__SKIP__') continue;
-    if (!adsetByType[type]) adsetByType[type] = [];
-    adsetByType[type].push({
-      name: (ad.adset_name || ad.ad_name || '').trim(),
-      ad_name: normName(ad.ad_name),
-      spend: parseFloat(ad.spend || 0),
-      purchase: adv(ad, 'purchase'),
-      cpa: adcpa(ad, 'purchase'),
-      roas: parseFloat(ad.spend||0)>0 ? adacv(ad,'purchase')/parseFloat(ad.spend||0) : 0
-    });
-  }
-
-  const ads14d = extra.ads30d || [];
-  const map14 = {};
-  for (const ad of ads14d) {
-    if (parseFloat(ad.spend || 0) <= 0) continue;
-    const type = classType(ad.campaign_name, ci);
-    if (type === '__SKIP__') continue;
-    const key = normName(ad.ad_name);
-    if (!map14[key]) {
-      map14[key] = JSON.parse(JSON.stringify(ad));
-      map14[key].ad_name = key;
-    } else {
-      const base = map14[key];
-      base.spend = String(parseFloat(base.spend || 0) + parseFloat(ad.spend || 0));
-      const mArr = (f) => {
-        if (!ad[f]) return; if (!base[f]) { base[f] = JSON.parse(JSON.stringify(ad[f])); return; }
-        for (const item of ad[f]) { const ex = base[f].find(x => x.action_type === item.action_type); if (ex) ex.value = String(parseFloat(ex.value || 0) + parseFloat(item.value || 0)); else base[f].push(JSON.parse(JSON.stringify(item))); }
-      };
-      mArr('actions'); mArr('action_values');
-      const sp = parseFloat(base.spend || 0); base.cost_per_action_type = [];
-      if (base.actions) for (const a of base.actions) { const v = parseFloat(a.value || 0); if (v > 0 && sp > 0) base.cost_per_action_type.push({ action_type: a.action_type, value: String((sp / v).toFixed(2)) }); }
-    }
-  }
-  const top14 = Object.values(map14)
-    .filter(ad => adv(ad, 'purchase') >= 3 && parseFloat(ad.spend || 0) >= 500)
-    .map(ad => ({
-      name: ad.ad_name,
-      spend: parseFloat(ad.spend || 0),
-      purchase: adv(ad, 'purchase'),
-      cpa: adcpa(ad, 'purchase'),
-      roas: parseFloat(ad.spend||0)>0 ? adacv(ad,'purchase')/parseFloat(ad.spend||0) : 0
-    }))
-    .sort((a, b) => b.spend - a.spend)
-    .slice(0, 6);
-
-  const typeSummary = Object.entries(typeStats).map(([t, s]) => {
-    const allAds = (adsetByType[t] || []).sort((a,b) => b.spend - a.spend);
-    const topSpendAd = allAds[0];
-    const topPurchaseAd = [...allAds].sort((a,b) => b.purchase - a.purchase)[0];
-    const zeroBadAds = allAds.filter(a => a.purchase === 0 && a.spend >= 200);
-    const hasOrderAds = allAds.filter(a => a.purchase > 0).sort((a,b) => b.purchase - a.purchase);
-
-    let detail = `【${t}】總花費NT$${Math.round(s.spend)}，購買${s.purchase}單，整體CPA${s.cpa>0?'NT$'+Math.round(s.cpa):'無'}，ROAS${s.roas>0?s.roas.toFixed(2)+'x':'無'}`;
-    if (topSpendAd) detail += `\n  → 花費最多：${topSpendAd.name}（NT$${Math.round(topSpendAd.spend)}，${topSpendAd.purchase}單${topSpendAd.cpa>0?'，CPA NT$'+Math.round(topSpendAd.cpa):'，零購買'}）`;
-    if (topPurchaseAd && topPurchaseAd.purchase > 0 && topPurchaseAd.name !== topSpendAd?.name) detail += `\n  → 帶單最多：${topPurchaseAd.name}（花費NT$${Math.round(topPurchaseAd.spend)}，${topPurchaseAd.purchase}單，CPA NT$${Math.round(topPurchaseAd.cpa)}）`;
-    if (hasOrderAds.length > 0) detail += `\n  → 有轉單廣告組：${hasOrderAds.slice(0,5).map(a=>`${a.name}（NT$${Math.round(a.spend)}，${a.purchase}單，CPA NT$${Math.round(a.cpa)}）`).join('；')}`;
-    if (zeroBadAds.length > 0) detail += `\n  → 零購買廣告組（${zeroBadAds.length}組，合計NT$${Math.round(zeroBadAds.reduce((s,a)=>s+a.spend,0))}）：${zeroBadAds.slice(0,8).map(a=>`${a.name}（NT$${Math.round(a.spend)}）`).join('、')}`;
-    return detail;
-  }).join('\n');
-
-  const top14Str = top14.length > 0 ? top14.map(a=>`${a.name}（花費NT$${Math.round(a.spend)}，${a.purchase}單，CPA NT$${Math.round(a.cpa)}，ROAS ${a.roas.toFixed(2)}x）`).join('\n') : '無';
-
-  return `你是一位資深的 Meta 廣告操作師，每天早上要向客戶報告昨天的廣告表現。
-請用「口語化、像在跟老闆面對面說話」的方式寫一份廣告日報，直接說重點，不要用條列式。
-
-## 客戶：${client.name}
-## 日期：${today}
-## CPA 標準：優秀 < NT$${thr.good}，可接受 < NT$${thr.ok}
-
----
-
-## 昨天整體數據
-- 廣告費：NT$${Math.round(spend).toLocaleString()}
-- 購買：${purchase} 單
-- 營業額：${acv > 0 ? 'NT$' + Math.round(acv).toLocaleString() : '無資料'}
-- CPA：${cpa > 0 ? 'NT$' + Math.round(cpa) : '無'}
-- ROAS：${roas > 0 ? roas.toFixed(2) + 'x' : '無'}
-- CTR：${ctr.toFixed(2)}%
-- 轉換率：${convRate.toFixed(2)}%
-
-## 月累計
-- 累計訂單：${moPurchase} 單
-- 累計營業額：${moAcv > 0 ? 'NT$' + Math.round(moAcv).toLocaleString() : '無資料'}
-${goalOrders > 0 ? `- 月目標：${goalOrders} 單，達成率 ${achRate.toFixed(0)}%，剩 ${daysLeft} 天，需再跑 ${needOrders} 單，日均約 ${dailyAvg.toFixed(0)} 單` : ''}
-
-## 昨天各廣告類型分組表現
-${typeSummary}
-
-## 近14天最佳素材（花費≥NT$500 且購買≥3單）
-${top14Str}
-
----
-
-## 口述稿寫作要求
-1. 語氣自然：像在跟老闆面對面講話
-2. 每個類型都要點出具體數字
-3. 解釋原因：CPA偏高要說是哪幾組零購買拉高的
-4. 判斷力：花費少說「樣本不夠，繼續觀察」；表現好的說建議加預算
-5. 結構：整體概況 → 月目標進度 → 各類型逐一分析 → 近14天素材亮點 → 今天行動建議
-6. 長度：400-600字
-7. 直接給口述稿內容，不要用 markdown 格式，不要用 ** 粗體
-
-請開始寫：`;
-}
-
-const PROXY_URL = 'https://anthropic-proxy.fatry53968.workers.dev';
-
-async function generateAIReport(ci, todayData, adsToday, extra) {
-  const containerId = `ai-report-text-${ci}`;
-  const statusId = `ai-report-status-${ci}`;
-  const el = document.getElementById(containerId);
-  const statusEl = document.getElementById(statusId);
-  if (!el) return;
-
-  if (statusEl) { statusEl.innerHTML = `<div class="ai-spinner"></div><span>AI 正在分析數據，產生口述稿中...</span>`; statusEl.style.display = 'flex'; }
-  el.textContent = '';
-
-  const prompt = buildAIPrompt(ci, todayData, adsToday, extra);
-
-  try {
-    const response = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text().catch(() => '');
-      let errMsg = `HTTP ${response.status}`;
-      try { const j = JSON.parse(errText); errMsg = j.error?.message || (typeof j.error === 'string' ? j.error : errMsg); } catch(e) { if(errText) errMsg = errText.slice(0,200); }
-      throw new Error(errMsg);
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '', fullText = '', started = false;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const data = line.slice(6).trim();
-        if (!data || data === '[DONE]') continue;
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.error) throw new Error(parsed.error.message || JSON.stringify(parsed.error));
-          const chunk = parsed.choices?.[0]?.delta?.content || '';
-          if (chunk) {
-            fullText += chunk;
-            if (!started) { started = true; if (statusEl) statusEl.style.display = 'none'; }
-            el.textContent = fullText;
-          }
-        } catch (e) {
-          if (e.message && (e.message.startsWith('HTTP') || e.message.includes('API_KEY') || e.message.includes('quota'))) throw e;
-        }
-      }
-    }
-
-    _aiReportCache[ci] = fullText;
-    if (statusEl) statusEl.style.display = 'none';
-    el.insertAdjacentHTML('afterend', `<div style="margin-top:10px"><button class="ai-regen-btn" onclick="regenAIReport(${ci})">↻ 重新生成</button></div>`);
-  } catch (err) {
-    if (statusEl) statusEl.style.display = 'none';
-    el.innerHTML = `<div class="ai-error-msg">⚠️ AI 生成失敗：${err.message}<br><br><button class="ai-regen-btn" onclick="regenAIReport(${ci})" style="margin-top:4px">↻ 重試</button></div>`;
-  }
-}
-
-const _aiReportCache = {};
-
-function regenAIReport(ci) {
-  const c = _reportCache[ci]; if (!c) return;
-  const wrap = document.getElementById(`ai-report-wrap-${ci}`);
-  if (wrap) wrap.querySelectorAll('.ai-regen-btn').forEach(b => b.parentElement?.remove());
-  generateAIReport(ci, c.todayData, c.adsToday, c.extra);
-}
-
-function copyReport(ci) {
-  const text = _aiReportCache[ci]; if (!text) return;
-  navigator.clipboard.writeText(text).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-  });
-  const btn = document.querySelector(`[onclick="copyReport(${ci})"]`);
-  if (btn) { btn.textContent = '✓ 已複製'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = '📋 複製口述稿'; btn.classList.remove('copied'); }, 2000); }
-}
-
+// ── MODIFIED: buildDailyReport — removed 月目標 and AI 口述報告 sections ──
 function buildDailyReport(ci, todayData, adsToday, extra = {}) {
-  const { today } = getDateRange();
   const client = CLIENTS[ci];
   const thr = client.cpa;
   const spend = parseFloat(todayData?.spend || 0);
@@ -1003,33 +684,9 @@ function buildDailyReport(ci, todayData, adsToday, extra = {}) {
 
   const mo = extra.monthTotal || null;
   const moPurchase = mo ? Math.round(gv(mo, 'purchase')) : 0;
-  const moAcv = mo ? gacv(mo, 'purchase') : 0;
-  const goalOrders = loadGoal(ci, 'orders');
-  const nowDate = new Date();
-  const dayOfMonth = nowDate.getDate() - 1;
-  const daysInMonth = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0).getDate();
-  const daysLeft = daysInMonth - dayOfMonth;
-  const needOrders = goalOrders > 0 ? Math.max(0, goalOrders - moPurchase) : 0;
-  const achRate = goalOrders > 0 ? (moPurchase / goalOrders * 100) : 0;
+
   const cpaCl_local = (c) => { const t=thr; return c<=0?'var(--text3)':c<t.good?'var(--green)':c<t.ok?'var(--amber)':'var(--red)'; };
   const rc_local = r => r>=3?'var(--green)':r>=2?'var(--amber)':r>0?'var(--red)':'var(--text3)';
-
-  const goalHtml = `
-    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:8px">
-      <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">月目標訂單數</div>
-        <input id="goal-orders-${ci}" type="number" value="${loadGoal(ci,'orders')||''}" placeholder="例：300"
-          style="width:110px;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;font-size:13px;background:var(--surface)"
-          onchange="saveGoal(${ci},'orders',this.value);refreshReport(${ci})">
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">月目標營業額</div>
-        <input id="goal-revenue-${ci}" type="number" value="${loadGoal(ci,'revenue')||''}" placeholder="例：500000"
-          style="width:130px;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;font-size:13px;background:var(--surface)"
-          onchange="saveGoal(${ci},'revenue',this.value);refreshReport(${ci})">
-      </div>
-      <div style="font-size:11px;color:var(--text3);padding-bottom:4px">↩ 輸入後按 Enter 自動更新</div>
-    </div>`;
 
   return `
     <div class="report-section">
@@ -1043,20 +700,6 @@ function buildDailyReport(ci, todayData, adsToday, extra = {}) {
         <div class="kpi-chip"><div class="kpi-chip-label">轉換率</div><div class="kpi-chip-value">${convRate.toFixed(2)}%</div></div>
         <div class="kpi-chip"><div class="kpi-chip-label">CTR</div><div class="kpi-chip-value">${ctr.toFixed(2)}%</div></div>
         ${moPurchase > 0 ? `<div class="kpi-chip"><div class="kpi-chip-label">月累計</div><div class="kpi-chip-value">${moPurchase} 單</div></div>` : ''}
-        ${goalOrders > 0 ? `<div class="kpi-chip"><div class="kpi-chip-label">月達成率</div><div class="kpi-chip-value" style="color:${achRate>=80?'var(--green)':achRate>=60?'var(--amber)':'var(--red)'}">${achRate.toFixed(0)}%</div></div>` : ''}
-      </div>
-    </div>
-    <div class="report-section">
-      <div class="report-section-title">🎯 月目標設定</div>
-      ${goalHtml}
-    </div>
-    <div class="report-section">
-      <div class="report-section-title">🤖 AI 口述報告（可直接說給老闆聽）</div>
-      <div class="ai-report-wrap" id="ai-report-wrap-${ci}">
-        <div class="ai-generating-bar" id="ai-report-status-${ci}" style="display:none">
-          <div class="ai-spinner"></div><span>AI 正在分析數據...</span>
-        </div>
-        <div class="ai-report-text" id="ai-report-text-${ci}"></div>
       </div>
     </div>`;
 }
@@ -1066,7 +709,6 @@ const _reportCache = {};
 function refreshReport(ci) {
   const c = _reportCache[ci]; if (!c) return;
   document.getElementById('daily-report-' + ci).innerHTML = buildDailyReport(ci, c.todayData, c.adsToday, c.extra);
-  generateAIReport(ci, c.todayData, c.adsToday, c.extra);
 }
 
 function buildCreativeSummary(ci, adsToday, adsYesterday) {
@@ -1181,21 +823,16 @@ function sortIcon(ci, field) {
   return `<span class="sort-icon">${s.sortDir === 'asc' ? '▲' : '▼'}</span>`;
 }
 
-/* ★ 核心修改：renderFlatTable 加入素材強度欄 */
 function renderFlatTable(ci, rawAds) {
   const el = document.getElementById('creative-' + ci);
   const s = getUiState(ci);
   const { period, filterKol, sortBy, sortDir } = s;
   const { today: d1 } = getDateRange();
 
-  // 取得帳戶月花費（從 cache）
   const cachedData = _reportCache[ci];
   const monthSpend = cachedData?.extra?.monthTotal ? parseFloat(cachedData.extra.monthTotal.spend || 0) : 0;
-  // 用 ads30d insights 計算素材強度（不需額外 API）
   const activeAdsetNames = cachedData?.extra?.activeAdsetNames || new Set();
-  const activeAdsetMap = buildActiveAdsetMapFromInsights(
-    cachedData?.adsToday || [], ci, activeAdsetNames
-  );
+  const activeAdsetMap = buildActiveAdsetMapFromInsights(cachedData?.adsToday || [], ci, activeAdsetNames);
 
   let classifiedAds = mergeAdsByName(rawAds, ci)
     .map(ad => ({ ...ad, _type: classType(ad._campaign || ad.campaign_name, ci) }))
@@ -1225,7 +862,6 @@ function renderFlatTable(ci, rawAds) {
   const filterLabel = filterKol === 'kol' ? '🌟 KOL 素材' : filterKol === 'non-kol' ? '非 KOL 素材' : '全部素材';
   const thCls = (field) => `sortable-th${s.sortBy === field ? ' sort-active' : ''}`;
 
-  // 素材強度圖例
   const tierLegend = `
     <span style="font-size:11px;color:var(--text3);margin-left:8px">素材強度：</span>
     <span class="tier-badge tier-T0" style="font-size:10px;width:auto;padding:1px 6px">T0</span><span style="font-size:10px;color:var(--text3);margin-right:4px"> ≥50組+月10萬</span>
@@ -1255,7 +891,6 @@ function renderFlatTable(ci, rawAds) {
     const rowClass = isKol ? 'class="kol-row"' : '';
     const retColor = vRetention !== null ? (vRetention >= 5 ? 'var(--green)' : vRetention >= 3 ? 'var(--amber)' : 'var(--red)') : 'var(--text3)';
 
-    // ★ 計算素材強度
     const tier = calcCreativeTier(ad.ad_name, activeAdsetMap, monthSpend);
     const activeCount = activeAdsetMap.get(normName(ad.ad_name)) || 0;
     const tierHtml = `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
@@ -1375,6 +1010,7 @@ function buildTopKPIs(t, y) {
   </div>`;
 }
 
+// ── MODIFIED: renderClient — 素材明細 now comes BEFORE 詳細指標對比 ──
 function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extra = {}) {
   const content = document.getElementById('content-' + ci);
   const { today, yesterday } = getDateRange();
@@ -1386,7 +1022,6 @@ function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extr
     <div class="daily-report-box">
       <div class="daily-report-header">
         <h2>📋 昨日廣告日報</h2>
-        <button class="copy-btn" onclick="copyReport(${ci})">📋 複製口述稿</button>
       </div>
       <div class="daily-report-body" id="daily-report-${ci}">
         <div class="report-loading">⏳ 產生日報中...</div>
@@ -1397,9 +1032,6 @@ function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extr
     <div id="creative-summary-${ci}"></div>
 
     ${buildTopKPIs(todayData, yesterdayData)}
-
-    <div class="section-title">詳細指標對比</div>
-    ${buildMetricsTable(todayData, yesterdayData)}
 
     <div class="section-title" style="margin-top:24px">素材明細（依花費排序）</div>
     <div class="creative-controls">
@@ -1420,6 +1052,9 @@ function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extr
     </div>
     <div id="creative-${ci}"><div class="period-loading">載入中...</div></div>
 
+    <div class="section-title" style="margin-top:28px">詳細指標對比</div>
+    ${buildMetricsTable(todayData, yesterdayData)}
+
     <div class="section-title" style="margin-top:28px">🌟 KOL 受眾測試追蹤（近30天 ${r30.since} ～ ${r30.until}）</div>
     <div class="kol-audience-box">
       <div class="kol-audience-header">
@@ -1433,7 +1068,6 @@ function renderClient(ci, todayData, yesterdayData, adsToday, adsYesterday, extr
 
   if (todayData) {
     document.getElementById('daily-report-' + ci).innerHTML = buildDailyReport(ci, todayData, adsToday, extra);
-    generateAIReport(ci, todayData, adsToday, extra);
   }
 
   document.getElementById('creative-summary-' + ci).innerHTML = buildCreativeSummary(ci, adsToday, adsYesterday);
@@ -1458,7 +1092,6 @@ async function loadClient(ci) {
       adsetCountYesterday: data.adsetCountYesterday,
       ads30d: data.ads30d || [],
       activeAdsetNames: data.activeAdsetNames || new Set(),
-
     });
   } catch (e) {
     dot.className = 'status-dot error'; txt.textContent = '資料載入失敗';
