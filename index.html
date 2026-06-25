@@ -344,10 +344,12 @@ function renderWordCloud(containerId, audMap){
   const entries=Object.entries(audMap).sort((a,b)=>b[1]-a[1]).slice(0,60);
   if(!entries.length){el.innerHTML='<div class="wc-empty-msg">無受眾資料</div>';return;}
   const maxS=entries[0][1], minS=entries[entries.length-1][1];
-  const W=el.offsetWidth||600, H=el.offsetHeight||260;
-  if(W<50){
-    // 容器還沒 layout，稍後重試
-    setTimeout(()=>renderWordCloud(containerId,audMap),80);
+  // getBoundingClientRect 在 iframe 裡也能正確取得寬度
+  const rect = el.getBoundingClientRect();
+  const W = rect.width  || el.offsetWidth  || el.clientWidth  || 600;
+  const H = rect.height || el.offsetHeight || el.clientHeight || 280;
+  if(W < 30){
+    setTimeout(()=>renderWordCloud(containerId,audMap), 120);
     return;
   }
   const placed=[], tt=document.getElementById('wc-tooltip');
@@ -428,16 +430,18 @@ function switchKolView(ci, view){
   document.getElementById(`kol-wc-wrap-${ci}`).style.display = view==='cloud'?'block':'none';
   document.getElementById(`kol-list-${ci}`).style.display    = view==='list' ?'block':'none';
   document.querySelectorAll(`.wc-tb-${ci}`).forEach(b=>b.classList.toggle('active', b.dataset.view===view));
-  // 切回文字雲時重繪（可能容器剛顯示）
   if(view==='cloud'){
     const data=_kolCache[ci];
     if(!data) return;
     const names=Object.keys(data.kolMap).sort((a,b)=>data.kolMap[b].totalSpend-data.kolMap[a].totalSpend);
-    setTimeout(()=>{
-      for(const kolName of names){
-        renderWordCloud(`wc-${ci}-${slug(kolName)}`, data.kolMap[kolName].audiences);
-      }
-    }, 80);
+    // 用 rAF 確保 display:block 生效後才量寬度
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        for(const kolName of names){
+          renderWordCloud(`wc-${ci}-${slug(kolName)}`, data.kolMap[kolName].audiences);
+        }
+      });
+    });
   }
 }
 
@@ -496,19 +500,38 @@ function renderKolSection(ci){
   }
   if(listWrap) listWrap.innerHTML = listHtml;
 
-  // 等容器真的有寬度才渲染
-  function drawAllClouds(attempt){
-    if(attempt > 30) return;
-    const firstEl = document.getElementById(`wc-${ci}-${slug(names[0])}`);
-    if(!firstEl || firstEl.offsetWidth < 100){
-      setTimeout(()=>drawAllClouds(attempt+1), 50);
-      return;
-    }
+  // ── 用 ResizeObserver 偵測容器真正有寬度才渲染 ──
+  // Claude 預覽框是 iframe，offsetWidth 長期為 0，用 RO 才可靠
+  const firstId = `wc-${ci}-${slug(names[0])}`;
+  const firstEl = document.getElementById(firstId);
+  if(!firstEl) return;
+
+  function drawAll(){
     for(const kolName of names){
       renderWordCloud(`wc-${ci}-${slug(kolName)}`, data.kolMap[kolName].audiences);
     }
   }
-  setTimeout(()=>drawAllClouds(0), 100);
+
+  if(firstEl.offsetWidth >= 100){
+    // 已有寬度，直接畫
+    setTimeout(drawAll, 30);
+  } else {
+    // 等 ResizeObserver 告知容器有寬度
+    const ro = new ResizeObserver((entries)=>{
+      const w = entries[0]?.contentRect?.width || 0;
+      if(w >= 100){
+        ro.disconnect();
+        setTimeout(drawAll, 30);
+      }
+    });
+    ro.observe(firstEl);
+    // 保險：最多等 3 秒後強制畫（用 getBoundingClientRect 重新量）
+    setTimeout(()=>{
+      ro.disconnect();
+      const rect = firstEl.getBoundingClientRect();
+      if(rect.width >= 50) drawAll();
+    }, 3000);
+  }
 }
 
 // ============================================================
